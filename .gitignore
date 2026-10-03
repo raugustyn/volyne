@@ -1,0 +1,27 @@
+# Local source data (symlink to Desktop/Drozda/Volyn)
+/sources/volyn
+
+# Secrets and local connection settings
+.env
+.env.*
+!.env.example
+*.pgpass
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Editor and OS
+.idea/
+.vscode/
+.cursor/
+.DS_Store
+Thumbs.db
+*~
+
+# Scratch
+*.tmp
+*.swp
