@@ -207,81 +207,25 @@ let flightPlane = null;
 let flightFrame = 0;
 
 oblasti.addTo(map);
-czechia.addTo(map);
 source.addTo(map);
 pies.addTo(map);
-target.addTo(map);
-flight.addTo(map);
-flight.on('add', startFlight);
-flight.on('remove', stopFlight);
+
+let activeSourceView = 'osoby';
+let peopleGroupCheck = null;
+let sharedSymbol = {
+    markerSize: 4,
+    labelColor: '#232323',
+    labelSize: 0,
+};
 
 addLayersPanel([
-    {
-        title: 'Lidé',
-        icon: PEOPLE_ICON,
-        layers: [
-            {
-                id: 'source',
-                name: 'source (Volyň)',
-                layer: source,
-                swatch: 'point',
-                color: DEFAULT_DISTRICT_COLOR,
-                labelField: 'name',
-                sizeAttribute: 'osob',
-                sizeChoices: [{ value: 'osob', label: 'osob' }],
-                markerSize: 4,
-                colorAttribute: 'district',
-                colorChoices: [{ value: 'district', label: 'okres' }],
-                labelColor: '#232323',
-                labelSize: 0,
-            },
-            {
-                id: 'pies',
-                name: 'koláče (source)',
-                layer: pies,
-                swatch: 'pie',
-                color: '#1c4e89',
-                labelField: 'name',
-                markerSize: 14,
-                pieType: 'vek',
-                labelColor: '#232323',
-                labelSize: 0,
-            },
-            {
-                id: 'target',
-                name: 'target (ČSR)',
-                layer: target,
-                swatch: 'point',
-                color: '#ff9e17',
-                labelField: 'location',
-                sizeAttribute: '',
-                markerSize: 5,
-                colorAttribute: '',
-                labelColor: '#232323',
-                labelSize: 0,
-            },
-        ],
-    },
-    {
-        title: 'Přesuny',
-        icon: FLIGHT_ICON,
-        layers: [
-            {
-                id: 'flight',
-                name: 'Lvov → Cheb',
-                layer: flight,
-                swatch: 'flow',
-                color: FLIGHT_COLOR,
-            },
-        ],
-    },
     {
         title: 'Hranice',
         icon: BOUNDARY_ICON,
         layers: [
             {
                 id: 'oblasti',
-                name: 'oblasti UA',
+                name: 'oblasti',
                 layer: oblasti,
                 swatch: 'area',
                 color: REGION_STYLE.fillColor,
@@ -292,7 +236,7 @@ addLayersPanel([
             },
             {
                 id: 'raiony',
-                name: 'raiony',
+                name: 'rajony',
                 layer: raiony,
                 swatch: 'area',
                 color: DISTRICT_STYLE.fillColor,
@@ -301,30 +245,41 @@ addLayersPanel([
                 labelColor: '#232323',
                 labelSize: 0,
             },
-            {
-                id: 'czechia',
-                name: 'hranice ČR',
-                layer: czechia,
-                swatch: 'area',
-                color: REGION_STYLE.fillColor,
-                labelField: 'name',
-                colorAttribute: '',
-                labelColor: '#232323',
-                labelSize: 0,
-            },
         ],
     },
-]);
+], {
+    id: 'source',
+    name: 'osoby',
+    layer: source,
+    swatch: 'point',
+    color: DEFAULT_DISTRICT_COLOR,
+    labelField: 'name',
+    sizeAttribute: 'osob',
+    sizeChoices: [{ value: 'osob', label: 'osob' }],
+    markerSize: 4,
+    colorAttribute: 'district',
+    colorChoices: [{ value: 'district', label: 'okres' }],
+    labelColor: '#232323',
+    labelSize: 0,
+}, {
+    id: 'pies',
+    name: 'koláče',
+    layer: pies,
+    swatch: 'pie',
+    color: '#1c4e89',
+    labelField: 'name',
+    markerSize: 14,
+    pieType: 'vek',
+    labelColor: '#232323',
+    labelSize: 0,
+});
 
 addColorLegend();
 
 Promise.all([
     loadLayer('data/ukr_volyn.geojson', [oblasti, raiony]),
-    loadLayer('data/czechia_boundaries.geojson', czechia),
     loadSourceLayers(),
-    loadLayer('data/volyn_target.geojson', target),
 ]).then(() => {
-    buildExampleFlight();
     layerItems.forEach((item) => {
         fillSizeSelect(item);
         fillColorSelect(item);
@@ -555,11 +510,27 @@ function countPeople(keyval) {
     return total;
 }
 
-function markerRadius(people) {
-    if (!people) {
-        return 4;
+function peopleCount(feature) {
+    const values = pieValues[String(feature?.properties?.id)]?.vek;
+    if (!Array.isArray(values)) {
+        return countPeople(feature?.properties?.keyval);
     }
-    return Math.max(4, Math.min(18, 3 + Math.sqrt(people)));
+    return values.reduce((sum, value) => sum + (Number(value) || 0), 0);
+}
+
+function updatePeopleStats(item) {
+    let max = 0;
+    let minPositive = Infinity;
+    item.layer.eachLayer((layer) => {
+        const total = peopleCount(layer.feature);
+        if (total > max) {
+            max = total;
+        }
+        if (total > 0 && total < minPositive) {
+            minPositive = total;
+        }
+    });
+    item.peopleStats = { max, min: minPositive === Infinity ? 0 : minPositive };
 }
 
 function bindBoundaryPopup(feature, layer) {
@@ -574,7 +545,7 @@ function bindBoundaryPopup(feature, layer) {
 
 function bindSourcePopup(feature, layer) {
     const props = feature.properties || {};
-    const people = countPeople(props.keyval);
+    const people = peopleCount(feature);
     const rows = [
         ['název', props.name],
         ['okres', props.district],
@@ -615,7 +586,7 @@ function popupTable(rows) {
 function fitToLayers() {
     const bounds = L.latLngBounds([]);
 
-    [source, target].forEach((layer) => {
+    [source].forEach((layer) => {
         layer.eachLayer((marker) => {
             if (typeof marker.getLatLng !== 'function') {
                 return;
@@ -633,9 +604,10 @@ function fitToLayers() {
     }
 }
 
-function addLayersPanel(groups) {
+function addLayersPanel(groups, sourceItem, pieItem) {
     const panel = document.getElementById('layers');
     panel.innerHTML = '<h1 class="layers-title">Vrstvy</h1>';
+    appendPeopleGroup(panel, sourceItem, pieItem);
 
     groups.forEach((group) => {
         const section = document.createElement('section');
@@ -671,72 +643,7 @@ function addLayersPanel(groups) {
         group.layers.forEach((item) => {
             applySavedLayer(item);
             layerItems.push(item);
-            const li = document.createElement('li');
-            li.className = 'layer-entry is-collapsed';
-
-            const row = document.createElement('div');
-            row.className = 'layer-row';
-
-            const twist = document.createElement(item.swatch === 'flow' ? 'span' : 'button');
-            twist.className = 'layer-twist';
-            if (item.swatch !== 'flow') {
-                twist.type = 'button';
-                twist.setAttribute('aria-expanded', 'false');
-                twist.setAttribute('aria-label', `Rozbalit ${item.name}`);
-                twist.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2 8 10.2 12 6.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                twist.addEventListener('click', () => {
-                    const open = twist.getAttribute('aria-expanded') === 'true';
-                    twist.setAttribute('aria-expanded', open ? 'false' : 'true');
-                    twist.setAttribute('aria-label', `${open ? 'Rozbalit' : 'Sbalit'} ${item.name}`);
-                    li.classList.toggle('is-collapsed', open);
-                });
-            } else {
-                twist.setAttribute('aria-hidden', 'true');
-            }
-
-            const label = document.createElement('label');
-            label.className = 'layer-name';
-
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.className = 'layer-check';
-            input.checked = map.hasLayer(item.layer);
-            input.addEventListener('change', () => {
-                setLayerVisible(item.layer, input.checked);
-                syncGroupCheck(groupCheck, itemChecks);
-            });
-
-            const swatch = document.createElement('span');
-            swatch.className = `layer-swatch layer-swatch-${item.swatch}`;
-            item.swatchEl = swatch;
-            paintSwatch(item);
-
-            const name = document.createElement('span');
-            name.className = 'layer-label';
-            name.textContent = item.name;
-
-            label.append(input, swatch, name);
-            row.append(twist, label);
-            li.append(row);
-
-            if (item.swatch !== 'flow') {
-                const form = document.createElement('div');
-                form.className = 'layer-symbology';
-                if (item.swatch === 'point') {
-                    form.append(markerSizeField(item));
-                }
-                if (item.swatch === 'pie') {
-                    form.append(pieSizeField(item));
-                    form.append(pieTypeField(item));
-                } else {
-                    form.append(fillColorField(item));
-                }
-                form.append(labelField(item));
-                li.append(form);
-            }
-
-            list.append(li);
-            itemChecks.push(input);
+            itemChecks.push(appendLayerEntry(list, item, () => syncGroupCheck(groupCheck, itemChecks)));
         });
 
         groupCheck.addEventListener('change', () => {
@@ -775,6 +682,320 @@ function addLayersPanel(groups) {
         }
     });
     updateColorLegend();
+}
+
+function appendPeopleGroup(panel, sourceItem, pieItem) {
+    const section = document.createElement('section');
+    section.className = 'layer-group';
+
+    const head = document.createElement('div');
+    head.className = 'layer-group-head';
+
+    const twist = document.createElement('button');
+    twist.type = 'button';
+    twist.className = 'layer-twist';
+    twist.setAttribute('aria-expanded', 'true');
+    twist.setAttribute('aria-label', 'Sbalit Lidé');
+    twist.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2 8 10.2 12 6.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const groupCheck = document.createElement('input');
+    groupCheck.type = 'checkbox';
+    groupCheck.className = 'layer-check';
+    groupCheck.setAttribute('aria-label', 'Lidé');
+    peopleGroupCheck = groupCheck;
+
+    const icon = document.createElement('span');
+    icon.className = 'layer-icon';
+    icon.innerHTML = PEOPLE_ICON;
+
+    const title = document.createElement('span');
+    title.className = 'layer-label';
+    title.textContent = 'Lidé';
+
+    const list = document.createElement('ul');
+    list.className = 'layer-items';
+    appendSourceRadios(list, sourceItem, pieItem);
+    groupCheck.checked = map.hasLayer(sourceItem.layer) || map.hasLayer(pieItem.layer);
+    groupCheck.addEventListener('change', () => {
+        if (groupCheck.checked) {
+            selectSourceView(activeSourceView);
+            return;
+        }
+        setLayerVisible(sourceItem.layer, false);
+        setLayerVisible(pieItem.layer, false);
+    });
+
+    twist.addEventListener('click', () => {
+        const open = twist.getAttribute('aria-expanded') === 'true';
+        twist.setAttribute('aria-expanded', open ? 'false' : 'true');
+        twist.setAttribute('aria-label', `${open ? 'Rozbalit' : 'Sbalit'} Lidé`);
+        section.classList.toggle('is-collapsed', open);
+    });
+
+    head.append(twist, groupCheck, icon, title);
+    section.append(head, list, sharedSymbolFields());
+    panel.append(section);
+}
+
+function appendLayerEntry(list, item, onToggle) {
+    const li = document.createElement('li');
+    li.className = 'layer-entry is-collapsed';
+
+    const row = document.createElement('div');
+    row.className = 'layer-row';
+
+    const twist = document.createElement(item.swatch === 'flow' ? 'span' : 'button');
+    twist.className = 'layer-twist';
+    if (item.swatch !== 'flow') {
+        twist.type = 'button';
+        twist.setAttribute('aria-expanded', 'false');
+        twist.setAttribute('aria-label', `Rozbalit ${item.name}`);
+        twist.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2 8 10.2 12 6.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        twist.addEventListener('click', () => {
+            const open = twist.getAttribute('aria-expanded') === 'true';
+            twist.setAttribute('aria-expanded', open ? 'false' : 'true');
+            twist.setAttribute('aria-label', `${open ? 'Rozbalit' : 'Sbalit'} ${item.name}`);
+            li.classList.toggle('is-collapsed', open);
+        });
+    } else {
+        twist.setAttribute('aria-hidden', 'true');
+    }
+
+    const label = document.createElement('label');
+    label.className = 'layer-name';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.className = 'layer-check';
+    input.checked = map.hasLayer(item.layer);
+    input.addEventListener('change', () => {
+        setLayerVisible(item.layer, input.checked);
+        if (onToggle) {
+            onToggle();
+        }
+    });
+
+    const swatch = document.createElement('span');
+    swatch.className = `layer-swatch layer-swatch-${item.swatch}`;
+    item.swatchEl = swatch;
+    paintSwatch(item);
+
+    const name = document.createElement('span');
+    name.className = 'layer-label';
+    name.textContent = item.name;
+
+    label.append(input, swatch, name);
+    row.append(twist, label);
+    li.append(row);
+
+    if (item.swatch !== 'flow') {
+        const form = document.createElement('div');
+        form.className = 'layer-symbology';
+        if (item.swatch === 'point') {
+            form.append(markerSizeField(item));
+        }
+        if (item.swatch === 'pie') {
+            form.append(pieSizeField(item));
+            form.append(pieTypeField(item));
+        } else {
+            form.append(fillColorField(item));
+        }
+        form.append(labelField(item));
+        li.append(form);
+    }
+
+    list.append(li);
+    return input;
+}
+
+function appendSourceRadios(list, sourceItem, pieItem) {
+    applySavedLayer(sourceItem);
+    applySavedLayer(pieItem);
+    pieItem.pieType = pieTypeById(pieItem.pieType).id;
+    layerItems.push(sourceItem, pieItem);
+
+    const sourceOn = map.hasLayer(sourceItem.layer);
+    const pieOn = map.hasLayer(pieItem.layer);
+    activeSourceView = pieOn && !sourceOn ? pieItem.pieType : 'osoby';
+    const active = activeSourceView === 'osoby' ? sourceItem : pieItem;
+    sharedSymbol = {
+        markerSize: active.markerSize,
+        labelColor: active.labelColor,
+        labelSize: active.labelSize || 0,
+    };
+
+    const peopleSwatch = document.createElement('span');
+    peopleSwatch.className = 'layer-swatch layer-swatch-point';
+    sourceItem.swatchEl = peopleSwatch;
+    paintSwatch(sourceItem);
+    appendSourceRadio(list, 'osoby', sourceItem.name, peopleSwatch);
+
+    PIE_TYPES.forEach((type) => {
+        const swatch = document.createElement('span');
+        swatch.className = 'layer-swatch layer-swatch-pie';
+        swatch.style.background = `conic-gradient(${type.slices.map((slice) => slice.color).join(', ')})`;
+        appendSourceRadio(list, type.id, type.label, swatch);
+    });
+    selectSourceView(activeSourceView);
+}
+
+function appendSourceRadio(list, id, text, swatch) {
+    const li = document.createElement('li');
+    li.className = 'layer-entry';
+    const row = document.createElement('div');
+    row.className = 'layer-row';
+    const label = document.createElement('label');
+    label.className = 'layer-name';
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'source-view';
+    input.className = 'layer-check';
+    input.checked = id === activeSourceView;
+    input.setAttribute('aria-label', text);
+    input.addEventListener('change', () => {
+        if (input.checked) {
+            selectSourceView(id);
+        }
+    });
+
+    const name = document.createElement('span');
+    name.className = 'layer-label';
+    name.textContent = text;
+    label.append(input, swatch, name);
+    row.append(label);
+    li.append(row);
+    list.append(li);
+}
+
+function selectSourceView(id) {
+    activeSourceView = id === 'osoby' ? 'osoby' : pieTypeById(id).id;
+    const people = layerById('source');
+    const pie = layerById('pies');
+    const item = activeSourceView === 'osoby' ? people : pie;
+    if (item.swatch === 'pie') {
+        item.pieType = activeSourceView;
+        item.name = pieTypeById(activeSourceView).label;
+    }
+    applySharedSymbol(item);
+    if (peopleGroupCheck) {
+        peopleGroupCheck.checked = true;
+        peopleGroupCheck.indeterminate = false;
+    }
+    setLayerVisible(people.layer, item === people);
+    setLayerVisible(pie.layer, item === pie);
+    applyLayerStyle(item);
+    applyLabels(item);
+    syncSharedInputs();
+}
+
+function applySharedSymbol(item) {
+    item.markerSize = sharedSymbol.markerSize;
+    item.labelColor = sharedSymbol.labelColor;
+    item.labelSize = sharedSymbol.labelSize;
+}
+
+function sharedSymbolFields() {
+    const form = document.createElement('div');
+    form.className = 'layer-symbology layer-symbology-shared';
+
+    const sizeField = document.createElement('div');
+    sizeField.className = 'sym-field';
+    const sizeCaption = document.createElement('span');
+    sizeCaption.className = 'sym-caption';
+    sizeCaption.textContent = 'Velikost značky';
+    const sizeRow = document.createElement('div');
+    sizeRow.className = 'sym-row';
+    const size = document.createElement('input');
+    size.type = 'number';
+    size.min = '1';
+    size.max = '40';
+    size.step = '1';
+    size.value = String(sharedSymbol.markerSize);
+    size.dataset.sharedSize = '1';
+    size.setAttribute('aria-label', 'Velikost značky');
+    const applySize = (commit) => {
+        sharedSymbol.markerSize = markerSizeValue(size.value, sharedSymbol.markerSize);
+        if (commit) {
+            size.value = String(sharedSymbol.markerSize);
+        }
+        const item = layerById(activeSourceView === 'osoby' ? 'source' : 'pies');
+        item.markerSize = sharedSymbol.markerSize;
+        applyLayerStyle(item);
+    };
+    size.addEventListener('input', () => applySize(false));
+    size.addEventListener('change', () => applySize(true));
+    const sizeUnit = document.createElement('span');
+    sizeUnit.className = 'sym-unit';
+    sizeUnit.textContent = 'px';
+    sizeRow.append(size, sizeUnit);
+    sizeField.append(sizeCaption, sizeRow);
+
+    const labelCaption = document.createElement('span');
+    labelCaption.className = 'sym-caption';
+    labelCaption.textContent = 'Popis';
+    const labelRow = document.createElement('div');
+    labelRow.className = 'sym-row';
+    const color = document.createElement('input');
+    color.type = 'color';
+    color.value = sharedSymbol.labelColor;
+    color.dataset.sharedLabelColor = '1';
+    color.setAttribute('aria-label', 'Barva popisu');
+    color.addEventListener('input', () => {
+        sharedSymbol.labelColor = color.value;
+        const item = layerById(activeSourceView === 'osoby' ? 'source' : 'pies');
+        item.labelColor = sharedSymbol.labelColor;
+        applyLabels(item);
+    });
+    const labelSize = document.createElement('input');
+    labelSize.type = 'number';
+    labelSize.min = '0';
+    labelSize.max = '32';
+    labelSize.step = '1';
+    labelSize.placeholder = '0';
+    labelSize.value = sharedSymbol.labelSize ? String(sharedSymbol.labelSize) : '';
+    labelSize.dataset.sharedLabelSize = '1';
+    labelSize.setAttribute('aria-label', 'Velikost popisu');
+    labelSize.addEventListener('input', () => {
+        sharedSymbol.labelSize = Math.max(0, Math.min(32, Number(labelSize.value) || 0));
+        const item = layerById(activeSourceView === 'osoby' ? 'source' : 'pies');
+        item.labelSize = sharedSymbol.labelSize;
+        applyLabels(item);
+    });
+    const labelUnit = document.createElement('span');
+    labelUnit.className = 'sym-unit';
+    labelUnit.textContent = 'px';
+    labelRow.append(color, labelSize, labelUnit);
+    const labelFieldBox = document.createElement('div');
+    labelFieldBox.className = 'sym-field';
+    labelFieldBox.append(labelCaption, labelRow);
+
+    form.append(sizeField, labelFieldBox);
+    return form;
+}
+
+function syncSharedInputs() {
+    document.querySelectorAll('[data-shared-size]').forEach((el) => {
+        el.value = String(sharedSymbol.markerSize);
+    });
+    document.querySelectorAll('[data-shared-label-color]').forEach((el) => {
+        el.value = sharedSymbol.labelColor;
+    });
+    document.querySelectorAll('[data-shared-label-size]').forEach((el) => {
+        el.value = sharedSymbol.labelSize ? String(sharedSymbol.labelSize) : '';
+    });
+}
+
+function syncPieInputs(item) {
+    document.querySelectorAll('[data-pie-size]').forEach((el) => {
+        el.value = String(item.markerSize);
+    });
+    document.querySelectorAll('[data-pie-label-color]').forEach((el) => {
+        el.value = item.labelColor;
+    });
+    document.querySelectorAll('[data-pie-label-size]').forEach((el) => {
+        el.value = item.labelSize ? String(item.labelSize) : '';
+    });
 }
 
 function layerById(id) {
@@ -870,9 +1091,15 @@ function labelField(item) {
     const color = document.createElement('input');
     color.type = 'color';
     color.value = item.labelColor;
+    if (item.swatch === 'pie') {
+        color.dataset.pieLabelColor = '1';
+    }
     color.setAttribute('aria-label', `Barva popisu ${item.name}`);
     color.addEventListener('input', () => {
         item.labelColor = color.value;
+        if (item.swatch === 'pie') {
+            syncPieInputs(item);
+        }
         applyLabels(item);
     });
 
@@ -883,9 +1110,15 @@ function labelField(item) {
     size.step = '1';
     size.placeholder = '0';
     size.value = item.labelSize ? String(item.labelSize) : '';
+    if (item.swatch === 'pie') {
+        size.dataset.pieLabelSize = '1';
+    }
     size.setAttribute('aria-label', `Velikost popisu ${item.name}`);
     size.addEventListener('input', () => {
         item.labelSize = Number(size.value) || 0;
+        if (item.swatch === 'pie') {
+            syncPieInputs(item);
+        }
         applyLabels(item);
     });
 
@@ -1131,14 +1364,16 @@ function pieSizeField(item) {
     size.max = '48';
     size.step = '1';
     size.value = String(item.markerSize);
+    size.dataset.pieSize = '1';
     size.setAttribute('aria-label', `Velikost koláče ${item.name}`);
     size.addEventListener('input', () => {
         item.markerSize = markerSizeValue(size.value, item.markerSize);
+        syncPieInputs(item);
         applyLayerStyle(item);
     });
     size.addEventListener('change', () => {
         item.markerSize = Math.max(8, markerSizeValue(size.value, item.markerSize));
-        size.value = String(item.markerSize);
+        syncPieInputs(item);
         applyLayerStyle(item);
     });
     const unit = document.createElement('span');
@@ -1261,6 +1496,9 @@ function paintSwatch(item) {
 function updateSizeStats(item) {
     if (!item.sizeAttribute || item.sizeAttribute === 'osob') {
         item.sizeStats = null;
+        if (item.sizeAttribute === 'osob') {
+            updatePeopleStats(item);
+        }
         return;
     }
     let min = Infinity;
@@ -1282,7 +1520,9 @@ function pointRadius(item, feature) {
         return size;
     }
     if (item.sizeAttribute === 'osob') {
-        return size * (markerRadius(countPeople(feature.properties?.keyval)) / 4);
+        const total = peopleCount(feature);
+        const stats = item.peopleStats || { max: Math.max(total, 1), min: total > 0 ? total : 0 };
+        return pieDiameter(size, total, stats.max, stats.min) / 2;
     }
     const value = numericValue(feature.properties?.[item.sizeAttribute]);
     const stats = item.sizeStats;
@@ -1446,6 +1686,9 @@ function writeUrl() {
     params.set('z', String(Math.round(map.getZoom() * 100) / 100));
     params.set('y', center.lat.toFixed(5));
     params.set('x', center.lng.toFixed(5));
+    params.delete('flight');
+    params.delete('target');
+    params.delete('czechia');
     layerItems.forEach((item) => {
         const color = String(item.labelColor || '').replace('#', '');
         const visible = map.hasLayer(item.layer) ? '1' : '0';
@@ -1480,26 +1723,24 @@ function updateColorLegend() {
     if (!colorLegendBox) {
         return;
     }
-    const sections = layerItems.filter((item) => item.colorAttribute);
-    const pieItem = layerItems.find((item) => item.swatch === 'pie' && map.hasLayer(item.layer));
-    if (!sections.length && !pieItem) {
+    const item = layerById(activeSourceView === 'osoby' ? 'source' : 'pies');
+    if (!item || !map.hasLayer(item.layer)) {
         colorLegendBox.style.display = 'none';
         colorLegendBox.innerHTML = '';
         return;
     }
     colorLegendBox.style.display = '';
-    const pieHtml = pieItem ? pieLegendHtml(pieItem) : '';
-    colorLegendBox.innerHTML = sections.map((item) => {
-        const rows = (item.colorCategories?.length
-            ? item.colorCategories
-            : (item.colorAttribute === 'district' ? Object.keys(DISTRICT_COLORS) : []))
-            .map((key) => {
-                const swatchClass = item.swatch === 'area' ? 'map-legend-swatch is-area' : 'map-legend-swatch';
-                return `<div><span class="${swatchClass}" style="background:${categoryColor(item, key)}"></span>${escapeHtml(categoryLegendLabel(item, key))}</div>`;
-            }).join('');
-        const title = `${item.name} podle ${ATTRIBUTE_LABELS[item.colorAttribute] || item.colorAttribute}`;
-        return `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(title)}</div>${rows}</div>`;
-    }).join('') + pieHtml;
+    if (item.swatch === 'pie') {
+        colorLegendBox.innerHTML = pieLegendHtml(item);
+        return;
+    }
+    const keys = item.colorCategories?.length
+        ? item.colorCategories
+        : Object.keys(DISTRICT_COLORS);
+    const rows = keys.map((key) => (
+        `<div><span class="map-legend-swatch" style="background:${categoryColor(item, key)}"></span>${escapeHtml(categoryLegendLabel(item, key))}</div>`
+    )).join('');
+    colorLegendBox.innerHTML = `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(item.name)}</div>${rows}</div>`;
 }
 
 function pieLegendHtml(item) {
@@ -1507,7 +1748,7 @@ function pieLegendHtml(item) {
     const rows = type.slices.map((slice) => (
         `<div><span class="map-legend-swatch" style="background:${slice.color}"></span>${escapeHtml(slice.label)}</div>`
     )).join('');
-    return `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(`${item.name}: ${type.label}`)}</div>${rows}</div>`;
+    return `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(type.label)}</div>${rows}</div>`;
 }
 
 function categoryLegendLabel(item, key) {

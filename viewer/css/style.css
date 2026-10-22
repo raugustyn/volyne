@@ -62,7 +62,8 @@ body {
     padding: 0 0 2px 8px;
 }
 
-.layer-group.is-collapsed .layer-items {
+.layer-group.is-collapsed .layer-items,
+.layer-group.is-collapsed .layer-symbology-shared {
     display: none;
 }
 
@@ -84,6 +85,10 @@ body {
     background: #fff;
     border: 1px solid #e1e1da;
     border-radius: 4px;
+}
+
+.layer-symbology-shared {
+    margin: 12px 4px 0;
 }
 
 .sym-field {
