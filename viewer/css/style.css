@@ -133,6 +133,12 @@ body {
     cursor: pointer;
 }
 
+.sym-row select {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+
 .sym-row input[type="number"] {
     width: 58px;
 }
@@ -161,6 +167,52 @@ body {
 
 .leaflet-tooltip.map-label::before {
     display: none;
+}
+
+.leaflet-tooltip.flight-label {
+    padding: 1px 6px;
+    background: #fff;
+    border: 1px solid #1c4e89;
+    border-radius: 10px;
+    color: #1c4e89;
+    font-weight: 700;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.leaflet-tooltip.flight-label::before {
+    display: none;
+}
+
+.flight-plane,
+.flight-anchor {
+    background: none;
+    border: 0;
+}
+
+.flight-plane-rot {
+    display: block;
+    width: 18px;
+    height: 18px;
+    color: #1c4e89;
+    filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
+}
+
+.flight-plane-rot svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.flight-arc {
+    stroke-dasharray: 7 9;
+    animation: flight-dash 0.9s linear infinite;
+}
+
+@keyframes flight-dash {
+    to {
+        stroke-dashoffset: -32;
+    }
 }
 
 .layer-twist {
@@ -219,6 +271,13 @@ body {
 .layer-swatch-area {
     width: 14px;
     height: 10px;
+}
+
+.layer-swatch-flow {
+    width: 16px;
+    height: 3px;
+    border: 0;
+    border-radius: 2px;
 }
 
 @media (max-width: 720px) {

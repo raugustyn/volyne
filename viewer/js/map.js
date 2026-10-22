@@ -27,7 +27,10 @@ const DISTRICT_STYLE = {
     fillOpacity: 0.18,
 };
 
+const CHEB = [50.07936, 12.37035];
+const FLIGHT_COLOR = '#1c4e89';
 const PEOPLE_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.2 13.2c.5-2.3 2.1-3.5 3.8-3.5s3.3 1.2 3.8 3.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="11.1" cy="5.7" r="1.45" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M10.3 9.9c1-.2 2.1.3 2.7 1.2.4.6.7 1.3.8 2.1" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+const FLIGHT_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.6 9.1V8.1L9.2 5.4V2.6a1.2 1.2 0 0 0-2.4 0v2.8L2.4 8.1v1l4.4-1.4v2.6l-1.2.9v1.1l2.4-.7 2.4.7V11.2l-1.2-.9V7.7l4.4 1.4Z" fill="currentColor"/></svg>';
 const BOUNDARY_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.8 11.8 5.2 4.2 12.2 3.2 13.4 8.6 8.2 13.2Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const SIZE_SKIP = new Set(['id', 'osm_id', 'keyval', 'gps']);
 const COLOR_SKIP = new Set([
@@ -47,11 +50,20 @@ const CATEGORY_PALETTE = [
 const ATTRIBUTE_LABELS = { district: 'okres' };
 const layerItems = [];
 let colorLegendBox;
+let urlReady = false;
+const urlState = readUrlState();
 
-const map = L.map('map').setView(PRAGUE, INITIAL_ZOOM);
+const map = L.map('map').setView(
+    urlState.view ? [urlState.view.y, urlState.view.x] : PRAGUE,
+    urlState.view ? urlState.view.z : INITIAL_ZOOM,
+);
+map.on('moveend', writeUrl);
 
 map.createPane('boundaries');
 map.getPane('boundaries').style.zIndex = 350;
+
+map.createPane('flows');
+map.getPane('flows').style.zIndex = 500;
 
 map.createPane('points');
 const pointsPane = map.getPane('points');
@@ -99,10 +111,18 @@ const target = L.geoJSON(null, {
     onEachFeature: bindTargetPopup,
 });
 
+const flight = L.layerGroup();
+let flightArc = [];
+let flightPlane = null;
+let flightFrame = 0;
+
 oblasti.addTo(map);
 czechia.addTo(map);
 source.addTo(map);
 target.addTo(map);
+flight.addTo(map);
+flight.on('add', startFlight);
+flight.on('remove', stopFlight);
 
 addLayersPanel([
     {
@@ -118,6 +138,7 @@ addLayersPanel([
                 labelField: 'name',
                 sizeAttribute: 'osob',
                 sizeChoices: [{ value: 'osob', label: 'osob' }],
+                markerSize: 4,
                 colorAttribute: 'district',
                 colorChoices: [{ value: 'district', label: 'okres' }],
                 labelColor: '#232323',
@@ -131,9 +152,23 @@ addLayersPanel([
                 color: '#ff9e17',
                 labelField: 'location',
                 sizeAttribute: '',
+                markerSize: 5,
                 colorAttribute: '',
                 labelColor: '#232323',
                 labelSize: 0,
+            },
+        ],
+    },
+    {
+        title: 'Přesuny',
+        icon: FLIGHT_ICON,
+        layers: [
+            {
+                id: 'flight',
+                name: 'Lvov → Cheb',
+                layer: flight,
+                swatch: 'flow',
+                color: FLIGHT_COLOR,
             },
         ],
     },
@@ -186,16 +221,165 @@ Promise.all([
     loadLayer('data/volyn_source.geojson', source),
     loadLayer('data/volyn_target.geojson', target),
 ]).then(() => {
+    buildExampleFlight();
     layerItems.forEach((item) => {
         fillSizeSelect(item);
         fillColorSelect(item);
         applyLayerStyle(item);
         applyLabels(item);
     });
-    fitToLayers();
+    if (!urlState.view) {
+        fitToLayers();
+    }
+    urlReady = true;
+    writeUrl();
 }).catch((error) => {
     console.error('GeoJSON se nepodařilo načíst', error);
 });
+
+function buildExampleFlight() {
+    const lviv = layerCenter(oblasti, 'Львівська область');
+    if (!lviv) {
+        return;
+    }
+    flightArc = curvedRoute(lviv, CHEB);
+    const popup = '<strong>Ukázka přesunu</strong><div>Lvovská oblast → okres Cheb</div>';
+    const halo = L.polyline(flightArc, {
+        pane: 'flows',
+        color: '#ffffff',
+        weight: 7,
+        opacity: 0.9,
+        interactive: false,
+    });
+    const line = L.polyline(flightArc, {
+        pane: 'flows',
+        className: 'flight-arc',
+        color: FLIGHT_COLOR,
+        weight: 2.5,
+        opacity: 1,
+    });
+    line.bindPopup(popup);
+    const ends = [CHEB, lviv].map((latlng) => L.circleMarker(latlng, {
+        pane: 'flows',
+        radius: 5,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: FLIGHT_COLOR,
+        fillOpacity: 1,
+    }).bindPopup(popup));
+    flightPlane = L.marker(lviv, {
+        pane: 'flows',
+        interactive: false,
+        icon: L.divIcon({
+            className: 'flight-plane',
+            html: `<span class="flight-plane-rot">${FLIGHT_ICON}</span>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+        }),
+    });
+    const crest = flightArc.reduce((highest, point) => (point[0] > highest[0] ? point : highest), flightArc[0]);
+    const label = L.marker(crest, {
+        pane: 'flows',
+        interactive: false,
+        icon: L.divIcon({ className: 'flight-anchor', iconSize: [0, 0] }),
+    });
+    label.bindTooltip('Lvov → Cheb', {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -4],
+        className: 'flight-label',
+        opacity: 1,
+        interactive: false,
+    });
+    flight.addLayer(halo);
+    flight.addLayer(line);
+    ends.forEach((end) => flight.addLayer(end));
+    flight.addLayer(label);
+    flight.addLayer(flightPlane);
+    if (map.hasLayer(flight)) {
+        startFlight();
+    }
+}
+
+function layerCenter(layer, name) {
+    let center = null;
+    layer.eachLayer((path) => {
+        if (path.feature?.properties?.name === name && typeof path.getBounds === 'function') {
+            const point = path.getBounds().getCenter();
+            center = [point.lat, point.lng];
+        }
+    });
+    return center;
+}
+
+function curvedRoute(from, to) {
+    const dLat = to[0] - from[0];
+    const dLng = to[1] - from[1];
+    const length = Math.hypot(dLat, dLng) || 1;
+    let offLat = -dLng / length;
+    let offLng = dLat / length;
+    if (offLat < 0) {
+        offLat *= -1;
+        offLng *= -1;
+    }
+    const bend = length * 0.22;
+    const control = [
+        (from[0] + to[0]) / 2 + offLat * bend,
+        (from[1] + to[1]) / 2 + offLng * bend,
+    ];
+    const steps = 72;
+    const points = [];
+    for (let i = 0; i <= steps; i += 1) {
+        const t = i / steps;
+        const u = 1 - t;
+        points.push([
+            u * u * from[0] + 2 * u * t * control[0] + t * t * to[0],
+            u * u * from[1] + 2 * u * t * control[1] + t * t * to[1],
+        ]);
+    }
+    return points;
+}
+
+function startFlight() {
+    if (flightFrame || !flightPlane || flightArc.length < 2 || !map.hasLayer(flight)) {
+        return;
+    }
+    const started = performance.now();
+    const duration = 7000;
+    const pause = 900;
+    flightFrame = setInterval(() => {
+        if (!map.hasLayer(flight) || !flightPlane) {
+            stopFlight();
+            return;
+        }
+        const elapsed = (performance.now() - started) % (duration + pause);
+        const t = elapsed >= duration ? 1 : elapsed / duration;
+        const along = t * (flightArc.length - 1);
+        const index = Math.min(flightArc.length - 2, Math.floor(along));
+        const local = along - index;
+        const from = flightArc[index];
+        const to = flightArc[index + 1];
+        flightPlane.setLatLng([
+            from[0] + (to[0] - from[0]) * local,
+            from[1] + (to[1] - from[1]) * local,
+        ]);
+        const rot = flightPlane.getElement()?.querySelector('.flight-plane-rot');
+        if (rot) {
+            rot.style.transform = `rotate(${screenBearing(from, to) + 90}deg)`;
+        }
+    }, 40);
+}
+
+function stopFlight() {
+    clearInterval(flightFrame);
+    flightFrame = 0;
+}
+
+function screenBearing(from, to) {
+    const start = map.latLngToLayerPoint(from);
+    const end = map.latLngToLayerPoint(to);
+    return Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
+}
 
 async function loadLayer(url, layers) {
     const response = await fetch(url);
@@ -368,6 +552,7 @@ function addLayersPanel(groups) {
         const itemChecks = [];
 
         group.layers.forEach((item) => {
+            applySavedLayer(item);
             layerItems.push(item);
             const li = document.createElement('li');
             li.className = 'layer-entry is-collapsed';
@@ -375,18 +560,22 @@ function addLayersPanel(groups) {
             const row = document.createElement('div');
             row.className = 'layer-row';
 
-            const twist = document.createElement('button');
-            twist.type = 'button';
+            const twist = document.createElement(item.swatch === 'flow' ? 'span' : 'button');
             twist.className = 'layer-twist';
-            twist.setAttribute('aria-expanded', 'false');
-            twist.setAttribute('aria-label', `Rozbalit ${item.name}`);
-            twist.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2 8 10.2 12 6.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-            twist.addEventListener('click', () => {
-                const open = twist.getAttribute('aria-expanded') === 'true';
-                twist.setAttribute('aria-expanded', open ? 'false' : 'true');
-                twist.setAttribute('aria-label', `${open ? 'Rozbalit' : 'Sbalit'} ${item.name}`);
-                li.classList.toggle('is-collapsed', open);
-            });
+            if (item.swatch !== 'flow') {
+                twist.type = 'button';
+                twist.setAttribute('aria-expanded', 'false');
+                twist.setAttribute('aria-label', `Rozbalit ${item.name}`);
+                twist.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6.2 8 10.2 12 6.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                twist.addEventListener('click', () => {
+                    const open = twist.getAttribute('aria-expanded') === 'true';
+                    twist.setAttribute('aria-expanded', open ? 'false' : 'true');
+                    twist.setAttribute('aria-label', `${open ? 'Rozbalit' : 'Sbalit'} ${item.name}`);
+                    li.classList.toggle('is-collapsed', open);
+                });
+            } else {
+                twist.setAttribute('aria-hidden', 'true');
+            }
 
             const label = document.createElement('label');
             label.className = 'layer-name';
@@ -411,16 +600,19 @@ function addLayersPanel(groups) {
 
             label.append(input, swatch, name);
             row.append(twist, label);
+            li.append(row);
 
-            const form = document.createElement('div');
-            form.className = 'layer-symbology';
-            if (item.swatch === 'point') {
-                form.append(markerSizeField(item));
+            if (item.swatch !== 'flow') {
+                const form = document.createElement('div');
+                form.className = 'layer-symbology';
+                if (item.swatch === 'point') {
+                    form.append(markerSizeField(item));
+                }
+                form.append(fillColorField(item));
+                form.append(labelField(item));
+                li.append(form);
             }
-            form.append(fillColorField(item));
-            form.append(labelField(item));
 
-            li.append(row, form);
             list.append(li);
             itemChecks.push(input);
         });
@@ -485,12 +677,17 @@ function fillColorField(item) {
 }
 
 function markerSizeField(item) {
-    const field = document.createElement('label');
+    const field = document.createElement('div');
     field.className = 'sym-field';
     const caption = document.createElement('span');
     caption.className = 'sym-caption';
     caption.textContent = 'Velikost značky';
+
+    const row = document.createElement('div');
+    row.className = 'sym-row';
+
     const select = document.createElement('select');
+    select.setAttribute('aria-label', `Atribut velikosti ${item.name}`);
     select.addEventListener('change', () => {
         if (select.dataset.ready !== '1') {
             return;
@@ -500,8 +697,39 @@ function markerSizeField(item) {
     });
     item.sizeSelect = select;
     fillSizeSelect(item);
-    field.append(caption, select);
+
+    const size = document.createElement('input');
+    size.type = 'number';
+    size.min = '1';
+    size.max = '40';
+    size.step = '1';
+    size.value = String(item.markerSize);
+    size.setAttribute('aria-label', `Velikost značky ${item.name}`);
+    size.addEventListener('input', () => {
+        item.markerSize = markerSizeValue(size.value, item.markerSize);
+        applyLayerStyle(item);
+    });
+    size.addEventListener('change', () => {
+        item.markerSize = markerSizeValue(size.value, item.markerSize);
+        size.value = String(item.markerSize);
+        applyLayerStyle(item);
+    });
+
+    const unit = document.createElement('span');
+    unit.className = 'sym-unit';
+    unit.textContent = 'px';
+
+    row.append(select, size, unit);
+    field.append(caption, row);
     return field;
+}
+
+function markerSizeValue(raw, fallback) {
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value <= 0) {
+        return fallback;
+    }
+    return Math.max(1, Math.min(40, value));
 }
 
 function labelField(item) {
@@ -561,6 +789,10 @@ function fillSizeSelect(item) {
         });
     });
     const current = item.sizeAttribute || '';
+    const loaded = item.layer.getLayers().length > 0;
+    if (current && !labels.has(current) && !loaded) {
+        labels.set(current, current);
+    }
     const chosen = current === '' || labels.has(current) ? current : '';
     item.sizeSelect.dataset.filling = '1';
     item.sizeSelect.replaceChildren();
@@ -595,6 +827,10 @@ function fillColorSelect(item) {
         });
     });
     const current = item.colorAttribute || '';
+    const loaded = item.layer.getLayers().length > 0;
+    if (current && !labels.has(current) && !loaded) {
+        labels.set(current, ATTRIBUTE_LABELS[current] || current);
+    }
     const chosen = current === '' || labels.has(current) ? current : '';
     item.colorSelect.dataset.filling = '1';
     item.colorSelect.replaceChildren();
@@ -616,6 +852,11 @@ function fillColorSelect(item) {
 }
 
 function applyLayerStyle(item) {
+    if (item.swatch === 'flow') {
+        paintSwatch(item);
+        writeUrl();
+        return;
+    }
     updateSizeStats(item);
     updateColorCategories(item);
     item.layer.eachLayer((layer) => {
@@ -623,6 +864,7 @@ function applyLayerStyle(item) {
     });
     paintSwatch(item);
     updateColorLegend();
+    writeUrl();
 }
 
 function featureStyle(item, feature) {
@@ -687,6 +929,10 @@ function paintSwatch(item) {
     if (!item.swatchEl) {
         return;
     }
+    if (item.swatch === 'flow') {
+        item.swatchEl.style.background = item.color;
+        return;
+    }
     const mix = item.swatch === 'area' ? 65 : 100;
     if (!item.colorAttribute) {
         item.swatchEl.style.background = `color-mix(in srgb, ${item.color} ${mix}%, white)`;
@@ -721,18 +967,20 @@ function updateSizeStats(item) {
 }
 
 function pointRadius(item, feature) {
-    if (!item || !item.sizeAttribute) {
-        return 5;
+    const size = markerSizeValue(item?.markerSize, 5);
+    if (!item?.sizeAttribute) {
+        return size;
     }
     if (item.sizeAttribute === 'osob') {
-        return markerRadius(countPeople(feature.properties?.keyval));
+        return size * (markerRadius(countPeople(feature.properties?.keyval)) / 4);
     }
     const value = numericValue(feature.properties?.[item.sizeAttribute]);
     const stats = item.sizeStats;
     if (value === null || !stats || stats.max <= stats.min) {
-        return 5;
+        return size;
     }
-    return 4 + ((value - stats.min) / (stats.max - stats.min)) * 12;
+    const share = (value - stats.min) / (stats.max - stats.min);
+    return size * (1 + share * 3);
 }
 
 function numericValue(value) {
@@ -767,6 +1015,9 @@ function labelText(item, feature) {
 }
 
 function applyLabels(item) {
+    if (item.swatch === 'flow') {
+        return;
+    }
     const size = Math.max(0, Math.min(32, Number(item.labelSize) || 0));
     const color = /^#[0-9a-fA-F]{6}$/.test(item.labelColor) ? item.labelColor : '#232323';
     let style = document.getElementById(`label-style-${item.id}`);
@@ -796,6 +1047,7 @@ function applyLabels(item) {
             interactive: false,
         });
     });
+    writeUrl();
 }
 
 function setLayerVisible(layer, visible) {
@@ -803,11 +1055,89 @@ function setLayerVisible(layer, visible) {
         if (!map.hasLayer(layer)) {
             layer.addTo(map);
         }
-        return;
-    }
-    if (map.hasLayer(layer)) {
+    } else if (map.hasLayer(layer)) {
         map.removeLayer(layer);
     }
+    writeUrl();
+}
+
+function readUrlState() {
+    const params = new URLSearchParams(location.search);
+    const z = readCoord(params, 'z');
+    const x = readCoord(params, 'x');
+    const y = readCoord(params, 'y');
+    const view = z !== null && x !== null && y !== null
+        && z >= 0 && z <= 19 && Math.abs(y) <= 90 && Math.abs(x) <= 180
+        ? { z, x, y }
+        : null;
+    const layers = {};
+    ['source', 'target', 'oblasti', 'raiony', 'czechia', 'flight'].forEach((id) => {
+        const raw = params.get(id);
+        if (raw === null) {
+            return;
+        }
+        const [visible, sizeAttribute, markerSize, colorAttribute, labelColor, labelSize] = raw.split(',');
+        layers[id] = {
+            visible: visible === '1',
+            sizeAttribute: sizeAttribute || '',
+            markerSize: Number(markerSize),
+            colorAttribute: colorAttribute || '',
+            labelColor: /^[0-9a-fA-F]{6}$/.test(labelColor || '') ? `#${labelColor}` : '',
+            labelSize: Number(labelSize),
+        };
+    });
+    return { view, layers };
+}
+
+function readCoord(params, key) {
+    const raw = params.get(key);
+    if (raw === null || raw.trim() === '') {
+        return null;
+    }
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
+}
+
+function applySavedLayer(item) {
+    const saved = urlState.layers[item.id];
+    if (!saved) {
+        return;
+    }
+    setLayerVisible(item.layer, saved.visible);
+    if (item.swatch === 'point') {
+        item.sizeAttribute = saved.sizeAttribute;
+        if (Number.isFinite(saved.markerSize) && saved.markerSize > 0) {
+            item.markerSize = markerSizeValue(saved.markerSize, item.markerSize);
+        }
+    }
+    item.colorAttribute = saved.colorAttribute;
+    if (saved.labelColor) {
+        item.labelColor = saved.labelColor;
+    }
+    if (Number.isFinite(saved.labelSize)) {
+        item.labelSize = Math.max(0, Math.min(32, saved.labelSize));
+    }
+}
+
+function writeUrl() {
+    if (!urlReady) {
+        return;
+    }
+    const params = new URLSearchParams(location.search);
+    const center = map.getCenter();
+    params.set('z', String(Math.round(map.getZoom() * 100) / 100));
+    params.set('y', center.lat.toFixed(5));
+    params.set('x', center.lng.toFixed(5));
+    layerItems.forEach((item) => {
+        const color = String(item.labelColor || '').replace('#', '');
+        const visible = map.hasLayer(item.layer) ? '1' : '0';
+        const parts = item.swatch === 'point'
+            ? [visible, item.sizeAttribute || '', item.markerSize, item.colorAttribute || '', color, item.labelSize || 0]
+            : [visible, '', '', item.colorAttribute || '', color, item.labelSize || 0];
+        params.set(item.id, parts.join(','));
+    });
+    const query = params.toString();
+    history.replaceState(null, '', `${location.pathname}?${query}${location.hash}`);
 }
 
 function syncGroupCheck(groupCheck, itemChecks) {
