@@ -48,7 +48,89 @@ const CATEGORY_PALETTE = [
     '#f4a261', '#577590', '#90be6d', '#f94144',
 ];
 const ATTRIBUTE_LABELS = { district: 'okres' };
+const PIE_TYPES = [
+    {
+        id: 'vek',
+        label: 'pohlaví a věk',
+        slices: [
+            { label: 'muži 0–14', color: '#7aa2d6' },
+            { label: 'muži 14–55', color: '#1c4e89' },
+            { label: 'muži 56 a starší', color: '#0e2a4a' },
+            { label: 'ženy 0–14', color: '#f0a0b8' },
+            { label: 'ženy 14–55', color: '#c23b62' },
+            { label: 'ženy 56 a starší', color: '#6e2438' },
+        ],
+    },
+    {
+        id: 'zam',
+        label: 'zaměstnání',
+        slices: [
+            { label: 'inženýři, technici', color: '#5b8def' },
+            { label: 'dělníci', color: '#e85d4c' },
+            { label: 'úředníci', color: '#f4a261' },
+            { label: 'kolchozník', color: '#2a9d8f' },
+            { label: 'samostatný zemědělec', color: '#90be6d' },
+            { label: 'ostatní', color: '#9b5de5' },
+            { label: 'osob na vydržování', color: '#577590' },
+        ],
+    },
+    {
+        id: 'nar',
+        label: 'národnost',
+        slices: [
+            { label: 'Češi', color: '#1c4e89' },
+            { label: 'Slováci', color: '#e85d4c' },
+            { label: 'Rusové', color: '#f4a261' },
+            { label: 'Ukrajinci', color: '#2a9d8f' },
+            { label: 'Bělorusové', color: '#90be6d' },
+            { label: 'Poláci', color: '#9b5de5' },
+            { label: 'Němci', color: '#577590' },
+            { label: 'Lotyši', color: '#f15bb5' },
+            { label: 'Čuvašové', color: '#00bbf9' },
+            { label: 'Židé', color: '#f94144' },
+            { label: 'Mordvíni', color: '#b9f042' },
+            { label: 'Jiná', color: '#6c757d' },
+        ],
+    },
+    {
+        id: 'dob',
+        label: 'dobytek',
+        slices: [
+            { label: 'koně', color: '#8c5a3c' },
+            { label: 'krávy', color: '#d4a017' },
+            { label: 'býci a voli', color: '#6b3f1f' },
+            { label: 'mladý dobytek', color: '#e6c07b' },
+            { label: 'vepřů', color: '#e07a7a' },
+            { label: 'ovce', color: '#cfc6b8' },
+            { label: 'kozy', color: '#8d9a78' },
+            { label: 'drůbež', color: '#f4a261' },
+            { label: 'včelstva', color: '#f2c14e' },
+        ],
+    },
+    {
+        id: 'pud',
+        label: 'pozemky',
+        slices: [
+            { label: 'orná půda a zahrady', color: '#c4a35a' },
+            { label: 'louky', color: '#7dae6a' },
+            { label: 'sady', color: '#e07a5f' },
+            { label: 'lesy', color: '#2d6a4f' },
+            { label: 'jiná půda', color: '#8d99ae' },
+        ],
+    },
+    {
+        id: 'osud',
+        label: 'osud přesídlení',
+        slices: [
+            { label: 'přesídleno', color: '#2a9d8f' },
+            { label: 'zřekli se', color: '#e9c46a' },
+            { label: 'nedostavili se', color: '#e76f51' },
+            { label: 'zemřeli', color: '#6c757d' },
+        ],
+    },
+];
 const layerItems = [];
+let pieValues = {};
 let colorLegendBox;
 let urlReady = false;
 const urlState = readUrlState();
@@ -111,6 +193,14 @@ const target = L.geoJSON(null, {
     onEachFeature: bindTargetPopup,
 });
 
+const pies = L.geoJSON(null, {
+    pointToLayer: (feature, latlng) => L.marker(latlng, {
+        pane: 'points',
+        icon: pieIcon(feature),
+    }),
+    onEachFeature: bindPiePopup,
+});
+
 const flight = L.layerGroup();
 let flightArc = [];
 let flightPlane = null;
@@ -119,6 +209,7 @@ let flightFrame = 0;
 oblasti.addTo(map);
 czechia.addTo(map);
 source.addTo(map);
+pies.addTo(map);
 target.addTo(map);
 flight.addTo(map);
 flight.on('add', startFlight);
@@ -141,6 +232,18 @@ addLayersPanel([
                 markerSize: 4,
                 colorAttribute: 'district',
                 colorChoices: [{ value: 'district', label: 'okres' }],
+                labelColor: '#232323',
+                labelSize: 0,
+            },
+            {
+                id: 'pies',
+                name: 'koláče (source)',
+                layer: pies,
+                swatch: 'pie',
+                color: '#1c4e89',
+                labelField: 'name',
+                markerSize: 14,
+                pieType: 'vek',
                 labelColor: '#232323',
                 labelSize: 0,
             },
@@ -218,7 +321,7 @@ addColorLegend();
 Promise.all([
     loadLayer('data/ukr_volyn.geojson', [oblasti, raiony]),
     loadLayer('data/czechia_boundaries.geojson', czechia),
-    loadLayer('data/volyn_source.geojson', source),
+    loadSourceLayers(),
     loadLayer('data/volyn_target.geojson', target),
 ]).then(() => {
     buildExampleFlight();
@@ -379,6 +482,20 @@ function screenBearing(from, to) {
     const start = map.latLngToLayerPoint(from);
     const end = map.latLngToLayerPoint(to);
     return Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
+}
+
+async function loadSourceLayers() {
+    const [geoResponse, pieResponse] = await Promise.all([
+        fetch('data/volyn_source.geojson'),
+        fetch('data/source_pies.json'),
+    ]);
+    if (!geoResponse.ok || !pieResponse.ok) {
+        throw new Error(`source: ${geoResponse.status} / ${pieResponse.status}`);
+    }
+    pieValues = await pieResponse.json();
+    const geojson = await geoResponse.json();
+    source.addData(geojson);
+    pies.addData(geojson);
 }
 
 async function loadLayer(url, layers) {
@@ -608,7 +725,12 @@ function addLayersPanel(groups) {
                 if (item.swatch === 'point') {
                     form.append(markerSizeField(item));
                 }
-                form.append(fillColorField(item));
+                if (item.swatch === 'pie') {
+                    form.append(pieSizeField(item));
+                    form.append(pieTypeField(item));
+                } else {
+                    form.append(fillColorField(item));
+                }
                 form.append(labelField(item));
                 li.append(form);
             }
@@ -647,6 +769,9 @@ function addLayersPanel(groups) {
         if (item.colorSelect) {
             fillColorSelect(item);
             item.colorSelect.dataset.ready = '1';
+        }
+        if (item.pieSelect) {
+            item.pieSelect.dataset.ready = '1';
         }
     });
     updateColorLegend();
@@ -851,9 +976,189 @@ function fillColorSelect(item) {
     delete item.colorSelect.dataset.filling;
 }
 
+function pieTypeById(id) {
+    return PIE_TYPES.find((type) => type.id === id) || PIE_TYPES[0];
+}
+
+function pieNumbers(feature, typeId) {
+    const type = pieTypeById(typeId);
+    const record = pieValues[String(feature?.properties?.id)];
+    const values = record?.[type.id];
+    return type.slices.map((_, index) => Number(values?.[index]) || 0);
+}
+
+function pieIcon(feature) {
+    const item = layerById('pies');
+    const type = pieTypeById(item?.pieType);
+    const values = pieNumbers(feature, type.id);
+    const total = values.reduce((sum, value) => sum + value, 0);
+    const diameter = pieDiameter(item?.markerSize, total, item?.pieMax || total || 1, item?.pieMin || 0);
+    return pieDivIcon(type, values, diameter);
+}
+
+function pieDiameter(markerSize, total, max, minPositive) {
+    const smallest = markerSizeValue(markerSize, 14);
+    if (total <= 0 || max <= 0) {
+        return Math.max(6, Math.round(smallest * 0.55));
+    }
+    if (max <= minPositive) {
+        return smallest;
+    }
+    const span = Math.sqrt(max) - Math.sqrt(minPositive);
+    const place = span > 0 ? (Math.sqrt(total) - Math.sqrt(minPositive)) / span : 0;
+    return Math.round(smallest * (1 + 2 * place));
+}
+
+function pieDivIcon(type, values, diameter) {
+    const radius = diameter / 2;
+    const total = values.reduce((sum, value) => sum + value, 0);
+    let body = `<circle cx="${radius}" cy="${radius}" r="${radius - 0.8}" fill="#e4e4e0" stroke="#232323" stroke-width="1"/>`;
+    if (total > 0) {
+        let angle = -Math.PI / 2;
+        const parts = [];
+        values.forEach((value, index) => {
+            if (value <= 0) {
+                return;
+            }
+            const next = angle + (value / total) * Math.PI * 2;
+            if (value >= total - 1e-9) {
+                parts.push(`<circle cx="${radius}" cy="${radius}" r="${radius - 0.8}" fill="${type.slices[index].color}" stroke="#232323" stroke-width="1"/>`);
+            } else {
+                const large = next - angle > Math.PI ? 1 : 0;
+                const startX = radius + (radius - 0.8) * Math.cos(angle);
+                const startY = radius + (radius - 0.8) * Math.sin(angle);
+                const endX = radius + (radius - 0.8) * Math.cos(next);
+                const endY = radius + (radius - 0.8) * Math.sin(next);
+                parts.push(`<path d="M ${radius} ${radius} L ${startX} ${startY} A ${radius - 0.8} ${radius - 0.8} 0 ${large} 1 ${endX} ${endY} Z" fill="${type.slices[index].color}" stroke="#232323" stroke-width="0.6"/>`);
+            }
+            angle = next;
+        });
+        body = parts.join('');
+    }
+    return L.divIcon({
+        className: 'pie-marker',
+        html: `<svg width="${diameter}" height="${diameter}" viewBox="0 0 ${diameter} ${diameter}" aria-hidden="true">${body}</svg>`,
+        iconSize: [diameter, diameter],
+        iconAnchor: [radius, radius],
+    });
+}
+
+function refreshPies(item) {
+    const type = pieTypeById(item.pieType);
+    let max = 0;
+    let minPositive = Infinity;
+    item.layer.eachLayer((layer) => {
+        const total = pieNumbers(layer.feature, type.id).reduce((sum, value) => sum + value, 0);
+        if (total > max) {
+            max = total;
+        }
+        if (total > 0 && total < minPositive) {
+            minPositive = total;
+        }
+    });
+    item.pieMax = max;
+    item.pieMin = minPositive === Infinity ? 0 : minPositive;
+    item.layer.eachLayer((layer) => {
+        const values = pieNumbers(layer.feature, type.id);
+        const total = values.reduce((sum, value) => sum + value, 0);
+        const diameter = pieDiameter(item.markerSize, total, item.pieMax, item.pieMin);
+        layer.setIcon(pieDivIcon(type, values, diameter));
+        if (layer.getTooltip()) {
+            layer.getTooltip().options.offset = [Math.round(diameter / 2) + 4, 0];
+        }
+    });
+}
+
+function bindPiePopup(feature, layer) {
+    layer.bindPopup(() => {
+        const item = layerById('pies');
+        const type = pieTypeById(item?.pieType);
+        const values = pieNumbers(feature, type.id);
+        const props = feature.properties || {};
+        const rows = [
+            ['název', props.name],
+            ['okres', props.district],
+            ['obec / celek', props.municipality],
+        ];
+        type.slices.forEach((slice, index) => {
+            if (values[index]) {
+                rows.push([slice.label, values[index]]);
+            }
+        });
+        return `<strong>${escapeHtml(type.label)}</strong>${popupTable(rows)}`;
+    });
+}
+
+function pieTypeField(item) {
+    const field = document.createElement('label');
+    field.className = 'sym-field';
+    const caption = document.createElement('span');
+    caption.className = 'sym-caption';
+    caption.textContent = 'Typ koláče';
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', `Typ koláče ${item.name}`);
+    PIE_TYPES.forEach((type) => {
+        const option = document.createElement('option');
+        option.value = type.id;
+        option.textContent = type.label;
+        option.selected = type.id === item.pieType;
+        select.append(option);
+    });
+    select.value = item.pieType;
+    select.addEventListener('change', () => {
+        if (select.dataset.ready !== '1') {
+            return;
+        }
+        item.pieType = select.value;
+        applyLayerStyle(item);
+    });
+    item.pieSelect = select;
+    field.append(caption, select);
+    return field;
+}
+
+function pieSizeField(item) {
+    const field = document.createElement('label');
+    field.className = 'sym-field';
+    const caption = document.createElement('span');
+    caption.className = 'sym-caption';
+    caption.textContent = 'Velikost značky';
+    const row = document.createElement('div');
+    row.className = 'sym-row';
+    const size = document.createElement('input');
+    size.type = 'number';
+    size.min = '8';
+    size.max = '48';
+    size.step = '1';
+    size.value = String(item.markerSize);
+    size.setAttribute('aria-label', `Velikost koláče ${item.name}`);
+    size.addEventListener('input', () => {
+        item.markerSize = markerSizeValue(size.value, item.markerSize);
+        applyLayerStyle(item);
+    });
+    size.addEventListener('change', () => {
+        item.markerSize = Math.max(8, markerSizeValue(size.value, item.markerSize));
+        size.value = String(item.markerSize);
+        applyLayerStyle(item);
+    });
+    const unit = document.createElement('span');
+    unit.className = 'sym-unit';
+    unit.textContent = 'px';
+    row.append(size, unit);
+    field.append(caption, row);
+    return field;
+}
+
 function applyLayerStyle(item) {
     if (item.swatch === 'flow') {
         paintSwatch(item);
+        writeUrl();
+        return;
+    }
+    if (item.swatch === 'pie') {
+        refreshPies(item);
+        paintSwatch(item);
+        updateColorLegend();
         writeUrl();
         return;
     }
@@ -931,6 +1236,11 @@ function paintSwatch(item) {
     }
     if (item.swatch === 'flow') {
         item.swatchEl.style.background = item.color;
+        return;
+    }
+    if (item.swatch === 'pie') {
+        const type = pieTypeById(item.pieType);
+        item.swatchEl.style.background = `conic-gradient(${type.slices.map((slice) => slice.color).join(', ')})`;
         return;
     }
     const mix = item.swatch === 'area' ? 65 : 100;
@@ -1040,8 +1350,8 @@ function applyLabels(item) {
         }
         layer.bindTooltip(escapeHtml(text), {
             permanent: true,
-            direction: item.swatch === 'point' ? 'right' : 'center',
-            offset: item.swatch === 'point' ? [8, 0] : [0, 0],
+            direction: item.swatch === 'point' || item.swatch === 'pie' ? 'right' : 'center',
+            offset: item.swatch === 'point' || item.swatch === 'pie' ? [Math.ceil((item.markerSize || 8) * 0.7) + 4, 0] : [0, 0],
             className: `map-label map-label-${item.id}`,
             opacity: 1,
             interactive: false,
@@ -1059,6 +1369,7 @@ function setLayerVisible(layer, visible) {
         map.removeLayer(layer);
     }
     writeUrl();
+    updateColorLegend();
 }
 
 function readUrlState() {
@@ -1071,12 +1382,13 @@ function readUrlState() {
         ? { z, x, y }
         : null;
     const layers = {};
-    ['source', 'target', 'oblasti', 'raiony', 'czechia', 'flight'].forEach((id) => {
+    ['source', 'target', 'pies', 'oblasti', 'raiony', 'czechia', 'flight'].forEach((id) => {
         const raw = params.get(id);
         if (raw === null) {
             return;
         }
-        const [visible, sizeAttribute, markerSize, colorAttribute, labelColor, labelSize] = raw.split(',');
+        const parts = raw.split(',');
+        const [visible, sizeAttribute, markerSize, colorAttribute, labelColor, labelSize, pieType] = parts;
         layers[id] = {
             visible: visible === '1',
             sizeAttribute: sizeAttribute || '',
@@ -1084,6 +1396,7 @@ function readUrlState() {
             colorAttribute: colorAttribute || '',
             labelColor: /^[0-9a-fA-F]{6}$/.test(labelColor || '') ? `#${labelColor}` : '',
             labelSize: Number(labelSize),
+            pieType: pieType || '',
         };
     });
     return { view, layers };
@@ -1104,11 +1417,16 @@ function applySavedLayer(item) {
         return;
     }
     setLayerVisible(item.layer, saved.visible);
-    if (item.swatch === 'point') {
-        item.sizeAttribute = saved.sizeAttribute;
+    if (item.swatch === 'point' || item.swatch === 'pie') {
         if (Number.isFinite(saved.markerSize) && saved.markerSize > 0) {
             item.markerSize = markerSizeValue(saved.markerSize, item.markerSize);
         }
+    }
+    if (item.swatch === 'point') {
+        item.sizeAttribute = saved.sizeAttribute;
+    }
+    if (item.swatch === 'pie' && PIE_TYPES.some((type) => type.id === saved.pieType)) {
+        item.pieType = saved.pieType;
     }
     item.colorAttribute = saved.colorAttribute;
     if (saved.labelColor) {
@@ -1133,7 +1451,9 @@ function writeUrl() {
         const visible = map.hasLayer(item.layer) ? '1' : '0';
         const parts = item.swatch === 'point'
             ? [visible, item.sizeAttribute || '', item.markerSize, item.colorAttribute || '', color, item.labelSize || 0]
-            : [visible, '', '', item.colorAttribute || '', color, item.labelSize || 0];
+            : item.swatch === 'pie'
+                ? [visible, '', item.markerSize, '', color, item.labelSize || 0, item.pieType || 'vek']
+                : [visible, '', '', item.colorAttribute || '', color, item.labelSize || 0];
         params.set(item.id, parts.join(','));
     });
     const query = params.toString();
@@ -1161,12 +1481,14 @@ function updateColorLegend() {
         return;
     }
     const sections = layerItems.filter((item) => item.colorAttribute);
-    if (!sections.length) {
+    const pieItem = layerItems.find((item) => item.swatch === 'pie' && map.hasLayer(item.layer));
+    if (!sections.length && !pieItem) {
         colorLegendBox.style.display = 'none';
         colorLegendBox.innerHTML = '';
         return;
     }
     colorLegendBox.style.display = '';
+    const pieHtml = pieItem ? pieLegendHtml(pieItem) : '';
     colorLegendBox.innerHTML = sections.map((item) => {
         const rows = (item.colorCategories?.length
             ? item.colorCategories
@@ -1177,7 +1499,15 @@ function updateColorLegend() {
             }).join('');
         const title = `${item.name} podle ${ATTRIBUTE_LABELS[item.colorAttribute] || item.colorAttribute}`;
         return `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(title)}</div>${rows}</div>`;
-    }).join('');
+    }).join('') + pieHtml;
+}
+
+function pieLegendHtml(item) {
+    const type = pieTypeById(item.pieType);
+    const rows = type.slices.map((slice) => (
+        `<div><span class="map-legend-swatch" style="background:${slice.color}"></span>${escapeHtml(slice.label)}</div>`
+    )).join('');
+    return `<div class="map-legend-block"><div class="map-legend-title">${escapeHtml(`${item.name}: ${type.label}`)}</div>${rows}</div>`;
 }
 
 function categoryLegendLabel(item, key) {

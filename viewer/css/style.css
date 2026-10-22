@@ -280,6 +280,18 @@ body {
     border-radius: 2px;
 }
 
+.layer-swatch-pie {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.leaflet-marker-icon.pie-marker {
+    background: none;
+    border: 0;
+    pointer-events: auto;
+}
+
 @media (max-width: 720px) {
     .layers-panel {
         flex-basis: 176px;
