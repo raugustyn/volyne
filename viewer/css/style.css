@@ -4,9 +4,229 @@ body {
     height: 100%;
 }
 
+body {
+    display: flex;
+    color: #243038;
+    font: 13px/1.35 system-ui, sans-serif;
+}
+
 #map {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 100%;
+}
+
+.layers-panel {
+    flex: 0 0 248px;
+    width: 248px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+    background: #f3f4f2;
+    border-right: 1px solid #cfcfc8;
+    padding: 10px 8px 16px;
+    user-select: none;
+}
+
+.layers-title {
+    margin: 2px 6px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5e686f;
+}
+
+.layer-group + .layer-group {
+    margin-top: 6px;
+}
+
+.layer-group-head,
+.layer-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 26px;
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+
+.layer-group-head:hover,
+.layer-row:hover {
+    background: #e4eef6;
+}
+
+.layer-items {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 2px 8px;
+}
+
+.layer-group.is-collapsed .layer-items {
+    display: none;
+}
+
+.layer-entry.is-collapsed .layer-symbology {
+    display: none;
+}
+
+.layer-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.layer-symbology {
+    margin: 0 2px 8px 22px;
+    padding: 6px 8px 8px;
+    background: #fff;
+    border: 1px solid #e1e1da;
+    border-radius: 4px;
+}
+
+.sym-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sym-field + .sym-field {
+    margin-top: 8px;
+}
+
+.sym-caption,
+.sym-unit {
+    color: #5e686f;
+    font-size: 11px;
+}
+
+.sym-field select,
+.sym-row input[type="number"] {
+    box-sizing: border-box;
+    min-width: 0;
+    font: inherit;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #c8c8c0;
+    border-radius: 3px;
+    padding: 2px 4px;
+}
+
+.sym-field select {
+    width: 100%;
+}
+
+.sym-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sym-row input[type="color"] {
+    width: 32px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #c8c8c0;
+    background: #fff;
+    cursor: pointer;
+}
+
+.sym-row input[type="number"] {
+    width: 58px;
+}
+
+.layer-symbology input,
+.layer-symbology select {
+    user-select: auto;
+}
+
+.leaflet-tooltip.map-label {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow:
+        0 0 2px #fff,
+        1px 0 0 #fff,
+        -1px 0 0 #fff,
+        0 1px 0 #fff,
+        0 -1px 0 #fff;
+}
+
+.leaflet-tooltip.map-label::before {
+    display: none;
+}
+
+.layer-twist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #3d474e;
+    cursor: pointer;
+}
+
+.layer-twist svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.12s ease;
+}
+
+.layer-group.is-collapsed > .layer-group-head .layer-twist svg,
+.layer-entry.is-collapsed > .layer-row .layer-twist svg {
+    transform: rotate(-90deg);
+}
+
+.layer-check {
+    margin: 0;
+    accent-color: #2f6f9f;
+}
+
+.layer-icon,
+.layer-icon svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    color: #3d474e;
+}
+
+.layer-label {
+    min-width: 0;
+}
+
+.layer-swatch {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    border: 1px solid #232323;
+}
+
+.layer-swatch-point {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.layer-swatch-area {
+    width: 14px;
+    height: 10px;
+}
+
+@media (max-width: 720px) {
+    .layers-panel {
+        flex-basis: 176px;
+        width: 176px;
+        padding-right: 4px;
+    }
 }
 
 .feature-popup {
@@ -33,6 +253,12 @@ body {
     padding: 8px 10px;
     font: 12px/1.4 system-ui, sans-serif;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    max-height: 280px;
+    overflow: auto;
+}
+
+.map-legend-block + .map-legend-block {
+    margin-top: 8px;
 }
 
 .map-legend-title {
@@ -47,4 +273,10 @@ body {
     border-radius: 50%;
     margin-right: 6px;
     border: 1px solid #232323;
+}
+
+.map-legend-swatch.is-area {
+    width: 12px;
+    height: 8px;
+    border-radius: 1px;
 }

@@ -24,10 +24,10 @@ set +a
 CONN="host=$PGHOST dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD"
 
 ogr2ogr -overwrite -f GeoJSON -t_srs EPSG:4326 \
-  "$OUT_DIR/volyn_source2.geojson" \
+  "$OUT_DIR/volyn_source.geojson" \
   PG:"$CONN" \
-  -sql "SELECT * FROM volyn.source2 WHERE geom IS NOT NULL" \
-  -nln source2
+  -sql "SELECT * FROM volyn.source WHERE geom IS NOT NULL" \
+  -nln source
 
 ogr2ogr -overwrite -f GeoJSON -t_srs EPSG:4326 \
   "$OUT_DIR/volyn_target.geojson" \
