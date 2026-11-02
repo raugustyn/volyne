@@ -131,6 +131,7 @@ const PIE_TYPES = [
 ];
 const layerItems = [];
 let pieValues = {};
+let photosById = {};
 let colorLegendBox;
 let urlReady = false;
 const urlState = readUrlState();
@@ -440,14 +441,19 @@ function screenBearing(from, to) {
 }
 
 async function loadSourceLayers() {
-    const [geoResponse, pieResponse] = await Promise.all([
+    const [geoResponse, pieResponse, fotoResponse] = await Promise.all([
         fetch('data/volyn_source.geojson'),
         fetch('data/source_pies.json'),
+        fetch('data/foto/foto.json'),
     ]);
-    if (!geoResponse.ok || !pieResponse.ok) {
-        throw new Error(`source: ${geoResponse.status} / ${pieResponse.status}`);
+    if (!geoResponse.ok || !pieResponse.ok || !fotoResponse.ok) {
+        throw new Error(`source: ${geoResponse.status} / ${pieResponse.status} / ${fotoResponse.status}`);
     }
     pieValues = await pieResponse.json();
+    photosById = {};
+    Object.entries(await fotoResponse.json()).forEach(([key, record]) => {
+        photosById[String(record.id)] = { ...record, klic: key };
+    });
     const geojson = await geoResponse.json();
     source.addData(geojson);
     pies.addData(geojson);
@@ -556,7 +562,8 @@ function bindSourcePopup(feature, layer) {
         ['osob', people || null],
         ['GPS', props.gps],
     ];
-    layer.bindPopup(popupTable(rows));
+    layer.bindPopup(popupTable(rows) + photoBlock(props.id), { maxWidth: 340 });
+    keepPopupOpenOnImages(layer);
 }
 
 function bindTargetPopup(feature, layer) {
@@ -571,6 +578,42 @@ function bindTargetPopup(feature, layer) {
         ['GPS', props.gps],
     ];
     layer.bindPopup(popupTable(rows));
+}
+
+function photoUrl(key, file) {
+    return ['data', 'foto', key, ...String(file).split('/')].map(encodeURIComponent).join('/');
+}
+
+function photoBlock(id) {
+    const record = photosById[String(id)];
+    if (!record?.fotografie?.length) {
+        return '';
+    }
+    let heading = null;
+    const items = record.fotografie.map((photo) => {
+        let title = '';
+        const nextHeading = photo.nadpis || '';
+        if (nextHeading !== heading) {
+            heading = nextHeading;
+            title = nextHeading ? `<div class="foto-heading">${escapeHtml(nextHeading)}</div>` : '';
+        }
+        const src = photoUrl(record.klic, photo.soubor);
+        const caption = photo.popis
+            ? `<figcaption>${escapeHtml(photo.popis)}</figcaption>`
+            : '';
+        return `${title}<figure class="foto-item"><a href="${src}" target="_blank" rel="noopener"><img src="${src}" alt=""></a>${caption}</figure>`;
+    }).join('');
+    return `<div class="foto-block">${items}</div>`;
+}
+
+function keepPopupOpenOnImages(layer) {
+    layer.on('popupopen', (event) => {
+        event.popup.getElement()?.querySelectorAll('img').forEach((img) => {
+            if (!img.complete) {
+                img.addEventListener('load', () => event.popup.update(), { once: true });
+            }
+        });
+    });
 }
 
 function popupTable(rows) {
@@ -1318,8 +1361,9 @@ function bindPiePopup(feature, layer) {
                 rows.push([slice.label, values[index]]);
             }
         });
-        return `<strong>${escapeHtml(type.label)}</strong>${popupTable(rows)}`;
-    });
+        return `<strong>${escapeHtml(type.label)}</strong>${popupTable(rows)}${photoBlock(props.id)}`;
+    }, { maxWidth: 340 });
+    keepPopupOpenOnImages(layer);
 }
 
 function pieTypeField(item) {

@@ -1,0 +1,908 @@
+{
+  "19_Bojarka": {
+    "id": 19,
+    "adresar": "Bojarka",
+    "fotografie": [
+      {
+        "popis": "Fotokopie mapy katastru obcí Moskovština a Bojarka z roku 1875",
+        "soubor": "NAD1159_1_0528.jpg"
+      }
+    ]
+  },
+  "50_Boratín": {
+    "id": 50,
+    "adresar": "Boratín",
+    "fotografie": [
+      {
+        "popis": "Členové českého pěveckého souboru založeného v Boratíně v roce 1903, 1904",
+        "soubor": "NAD_1159_1_0725.jpeg"
+      },
+      {
+        "popis": "Dětská slavnost vítání jara, 1932",
+        "soubor": "NAD_1159_1_0726.jpeg"
+      },
+      {
+        "popis": "Skupiny cyklistů z Boratína, b.d.",
+        "soubor": "NAD_1159_1_0727.jpeg"
+      }
+    ]
+  },
+  "5_Chomout": {
+    "id": 5,
+    "adresar": "Chomout",
+    "fotografie": [
+      {
+        "popis": "Členové Sdružení české mládeže založeného v roce 1934 v Chomoutu, r. 1934",
+        "soubor": "NAD1159_1_0651_2.jpg"
+      },
+      {
+        "popis": "Účastníci sjezdu české mládeže v Chomoutu,  b.d.",
+        "soubor": "NAD1159_1_0652.jpg"
+      },
+      {
+        "popis": "Budova české obecné školy v Chomoutu, 1928",
+        "soubor": "NAD1159_1_0671_1.jpg"
+      },
+      {
+        "popis": "Žáci školy s učitelkou Annou Křívkovou, b.d.",
+        "soubor": "NAD1159_1_0672a.jpg"
+      },
+      {
+        "popis": "Žáci školy s učitelkou Annou Křívkovou, b.d.",
+        "soubor": "NAD1159_1_0672b.jpg"
+      },
+      {
+        "popis": "Žákovské představení Krakonošova medicína nastudované pod vedením učitelky Anny Křívkové, 1931",
+        "soubor": "NAD1159_1_0673a.jpg"
+      },
+      {
+        "popis": "Žákovské představení Krakonošova medicína nastudované pod vedením učitelky Anny Křívkové, 1931  (rub fotografie)",
+        "soubor": "NAD1159_1_0673b.jpg"
+      },
+      {
+        "popis": "Skupina chomoutských dopisovatelů časopisu Hlas Volyně a Hlídka dorostu na zahradě u Josefa Pally (Pavel Palla, Mikuláš Palla, Josef Rejzek a Kosef Mojdl), b.d.",
+        "soubor": "NAD1159_1_0733a.jpg"
+      },
+      {
+        "popis": "Hosté o posvícení u Joachyma Pally, b.d.",
+        "soubor": "NAD1159_1_0734_1.jpg"
+      }
+    ]
+  },
+  "4_Dubno": {
+    "id": 4,
+    "adresar": "Dubno",
+    "fotografie": [
+      {
+        "popis": "Funkcionáři sokolské jednoty – starosta Antonín Prokůpek, náčelnice Klavdija Venturová a náčelník Václav Maxa, r. 1932.",
+        "soubor": "NAD1159_1_0603a.jpg"
+      },
+      {
+        "popis": "Členové Sokola v Dubně s funkcionáři jednoty. [30. léta].",
+        "soubor": "NAD1159_1_0604.jpg"
+      },
+      {
+        "popis": "Žáci odbočky lvovské hudební školy v Dubně, r. 1926.",
+        "soubor": "NAD1159_1_0665.jpg"
+      },
+      {
+        "popis": "Vnitřek pravoslavného chrámu v Dubně.",
+        "soubor": "NAD1159_1_0773.jpg"
+      }
+    ]
+  },
+  "36_Huště": {
+    "id": 36,
+    "adresar": "Huště",
+    "fotografie": [
+      {
+        "popis": "Žáci české školy v Hušti u vánočního stromku",
+        "soubor": "NAD-1159_1_0670.jpeg"
+      }
+    ]
+  },
+  "85_Kupičov": {
+    "id": 85,
+    "adresar": "Kupičov",
+    "fotografie": [
+      {
+        "popis": "Žáci české školy s učitelem Janem Tomšem, b.d.",
+        "soubor": "NAD_1159_1_0675.jpeg"
+      },
+      {
+        "popis": "Členové školního divadelního kroužku s učiteli, b.d.",
+        "soubor": "NAD_1159_1_0676.jpeg"
+      },
+      {
+        "popis": "Český evangelický sbor před modlitebnou v Kupičově; začátek 20. století",
+        "soubor": "NAD_1159_1_0775.jpeg"
+      },
+      {
+        "popis": "Věřící po českých bohoslužbách před kostelem",
+        "soubor": "NAD_1159_1_0777.jpeg"
+      }
+    ],
+    "poznamky": [
+      "Z fondu SvČV, fotografie viz též f.Václav Kytl"
+    ]
+  },
+  "46_Luck": {
+    "id": 46,
+    "adresar": "Luck",
+    "fotografie": [
+      {
+        "popis": "Účastníci druhého kurzu pro učitele českých škol na Volyni, konaného v Lucku s profesory češtiny z Československa a se zástupci polského školství, 1928",
+        "soubor": "NAD_1159_0661-1.jpeg"
+      },
+      {
+        "popis": "Účastníci druhého kurzu pro učitele českých škol na Volyni, konaného v Lucku s profesory češtiny z Československa a se zástupci polského školství, 1928",
+        "soubor": "NAD_1159_0661-2.jpeg"
+      },
+      {
+        "popis": "Žáci třetí a šesté třídy české školy v Lucku se svými učiteli; 1946",
+        "soubor": "NAD_1159_1_0683.jpeg"
+      },
+      {
+        "popis": "Krajanský literární kroužek na schůzce v Lucku – Karel Půlpytel, Josef Foitík, Josef Rejsek, Josef Vlk, Jiří Rébl, Vladimír Ficek, Antonín Flengr; 30. léta 20. stol.",
+        "soubor": "NAD_1159_1_0742.jpeg"
+      },
+      {
+        "popis": "První divadelní kroužek v Lucku, b.d.",
+        "soubor": "NAD_1159_1_0743.jpeg"
+      }
+    ]
+  },
+  "10_Mirohošť": {
+    "id": 10,
+    "adresar": "Mirohošť",
+    "fotografie": [
+      {
+        "popis": "Cvičení dorostenců Sokola Mirohošť",
+        "soubor": "NAD1159_1_0621.jpg"
+      },
+      {
+        "popis": "Okrskový slet v Mirohošti – sokolská přísaha, prostná mužů a žen, 1932",
+        "soubor": "NAD1159_1_0622_1.jpg"
+      },
+      {
+        "popis": "Ženy – účastnice okrskového sletu v Mirohošti, 1932",
+        "soubor": "NAD1159_1_0622_3.jpg"
+      },
+      {
+        "popis": "Dorostenky Sokola Mirohošť ve cvičebních úborech, 30. léta 20. stol.",
+        "soubor": "NAD1159_1_0625_2.jpg"
+      }
+    ]
+  },
+  "28_Mlynov": {
+    "id": 28,
+    "adresar": "Mlynov",
+    "fotografie": [
+      {
+        "popis": "NAD_1159_1_0747_Tanec Beseda v podání dívčí taneční skupiny",
+        "soubor": "NAD_1159_1_0747_Tanec.jpeg"
+      }
+    ]
+  },
+  "29_Moskovština": {
+    "id": 29,
+    "adresar": "Moskovština",
+    "fotografie": [
+      {
+        "popis": "Kulturní dům a hasičská zbrojnice, b.d.",
+        "soubor": "NAD_1159_1_0748.jpeg"
+      },
+      {
+        "popis": "Hospodáři z Moskovštiny po práci při sportovním utkání, 1935",
+        "soubor": "NAD_1159_1_0749.jpeg"
+      },
+      {
+        "popis": "Mládež z Moskovštiny v českých krojích, b.d.",
+        "soubor": "NAD_1159_1_0750.jpeg"
+      },
+      {
+        "popis": "Poslední hudební zábava před okupací Polska, 1939",
+        "soubor": "NAD_1159_1_0751.jpeg"
+      }
+    ]
+  },
+  "58_Mstěšín": {
+    "id": 58,
+    "adresar": "Mstěšín",
+    "fotografie": [
+      {
+        "popis": "Žáci české školy ve třídě a před školní budovou, b.d.",
+        "soubor": "NAD_1159_1_0687.jpeg"
+      },
+      {
+        "popis": "Sportovní a taneční vystoupení žáků před školní budovou, b.d.",
+        "soubor": "NAD_1159_1_0688.jpeg"
+      },
+      {
+        "popis": "Rodiče poschůzi před školní budovou, b.d.",
+        "soubor": "NAD_1159_1_0689.jpeg"
+      }
+    ]
+  },
+  "27_Máslenka_Národní_muzeum": {
+    "id": 27,
+    "adresar": "Máslenka_Národní_muzeum",
+    "fotografie": [
+      {
+        "popis": "Družstevní mlýn v obci Máslenka, jednota zemědělsko-mlynářská,1935",
+        "soubor": "Národní muzeum/H8-18747.jpeg",
+        "nadpis": "Národní muzeum"
+      },
+      {
+        "popis": "Ukázka zvláštního druhu stavby domu z dřevěných polen. Střecha domu byla ze zinkového plechu. Dům byl postaven ve vesnici Máslenka u Dorohostaj, majitelem byl p. Tamfina, 1928",
+        "soubor": "Národní muzeum/H8-18861.jpeg",
+        "nadpis": "Národní muzeum"
+      },
+      {
+        "popis": "Družstevní mlýn v obci Máslenka, 20. léta 20. století",
+        "soubor": "Národní muzeum/H8-24638.jpeg",
+        "nadpis": "Národní muzeum"
+      }
+    ]
+  },
+  "32_Podhájce": {
+    "id": 32,
+    "adresar": "Podhájce",
+    "fotografie": [
+      {
+        "popis": "„Masopustní maškary“ v obci Podhájce v době 1. sv. války, 1916",
+        "soubor": "H8-18845.jpeg"
+      },
+      {
+        "popis": "Oslavy svátku Josefů v obci Podhájce. Oslav se zúčastnily občane z ukrajinské části vesnice /zleva/ a čeští občane se svou hudbou, 19. března 1929",
+        "soubor": "H8-18897.jpeg"
+      },
+      {
+        "popis": "V době krize stěhovali se někteří občané do Spojených Států Amerických. Z Podhájců se v roce 1929 odstěhoval český občan se svou rodinou p. Uhlíř. Na snímku vidíme jak všichni muži se loučí se svým rodákem, 1929",
+        "soubor": "H8-19167.jpeg"
+      },
+      {
+        "popis": "Hudebníci z obce Podhájce, na foto 14 blíže neurčených osob, 1915",
+        "soubor": "H8-24607.jpeg"
+      },
+      {
+        "popis": "Spolek dobrovolných hasičů obce Podhájce u Dubna, 1923",
+        "soubor": "H8-24634.jpeg"
+      }
+    ]
+  },
+  "150_Roman_Michalovka": {
+    "id": 150,
+    "adresar": "Roman/Michalovka",
+    "fotografie": [
+      {
+        "popis": "Pohled na domy a chmelnici, vpředu skupina obyvatel (1932)",
+        "soubor": "NAD1159_1_0520.jpg"
+      },
+      {
+        "popis": "Hudební sbor baptistické církve (30. léta) – poznámka: celkem tři fota",
+        "soubor": "NAD1159_1_0782_1.jpg"
+      },
+      {
+        "popis": "Hudební sbor baptistické církve (30. léta) – poznámka: celkem tři fota",
+        "soubor": "NAD1159_1_0782_2.jpg"
+      },
+      {
+        "popis": "Hudební sbor baptistické církve (30. léta) – poznámka: celkem tři fota",
+        "soubor": "NAD1159_1_0782_3.jpg"
+      },
+      {
+        "popis": "Pěvecký sbor českých evangelíků (1935)",
+        "soubor": "NAD1159_1_0783.jpg"
+      },
+      {
+        "popis": "Návštěvníci nedělní školy před baptistickou modlitebnou v Michalovce (1935)",
+        "soubor": "NAD1159_1_0784_1.jpg"
+      },
+      {
+        "popis": "Návštěvníci nedělní školy před baptistickou modlitebnou v Michalovce (1947)",
+        "soubor": "NAD1159_1_0784_2.jpg"
+      },
+      {
+        "popis": "Děti baptistického vyznání u vánočního stromečku",
+        "soubor": "NAD1159_1_0785.jpg"
+      },
+      {
+        "popis": "Sázení stromků před baptistickou modlitebnou (30. léta)",
+        "soubor": "NAD1159_1_0786.jpg"
+      }
+    ]
+  },
+  "308_Roman_Mirotín": {
+    "id": 308,
+    "adresar": "Roman/Mirotín",
+    "fotografie": [
+      {
+        "popis": "Před usedlostí krajana v Mirotíně",
+        "soubor": "NAD1159_1_0522.jpg"
+      },
+      {
+        "popis": "Návrat z práce na žebřiňáku",
+        "soubor": "NAD1159_1_0523.jpg"
+      },
+      {
+        "popis": "Skupina vesničanů v kočáru",
+        "soubor": "NAD1159_1_0524.jpg"
+      },
+      {
+        "popis": "Vesničané s ozbrojenou ochranou obce (1943–1944)",
+        "soubor": "NAD1159_1_0525.jpg"
+      },
+      {
+        "popis": "Členky sboru dobrovolných hasičů",
+        "soubor": "NAD1159_1_0580_1.jpg"
+      },
+      {
+        "popis": "Členky sboru dobrovolných hasičů u hasičské stříkačky",
+        "soubor": "NAD1159_1_0580_2.jpg"
+      },
+      {
+        "popis": "Mirotínští krajané na nádraží",
+        "soubor": "NAD1159_1_0746.jpg"
+      },
+      {
+        "popis": "Budova evangelicko-baptistického kostela v Mirotíně (1912)",
+        "soubor": "NAD1159_1_0787_1.jpg"
+      },
+      {
+        "popis": "Budova evangelicko-baptistického kostela v Mirotíně (nedatováno)",
+        "soubor": "NAD1159_1_0787_2.jpg"
+      },
+      {
+        "popis": "Členové biblického kurzu baptistů v Mirotíně (1922)",
+        "soubor": "NAD1159_1_0788.jpg"
+      },
+      {
+        "popis": "Baptističtí kazatelé po absolvování druhého nedělního kurzu v Mirotíně (1934)",
+        "soubor": "NAD1159_1_0789.jpg"
+      },
+      {
+        "popis": "Návštěvníci nedělní školy baptistů před kostelem (30. léta)",
+        "soubor": "NAD1159_1_0790.jpg"
+      },
+      {
+        "popis": "Pohřební obřad v baptistickém kostele 1943",
+        "soubor": "NAD1159_1_0791.jpg"
+      },
+      {
+        "popis": "Pohřeb obětí banderovců",
+        "soubor": "NAD1159_1_0792.jpg"
+      },
+      {
+        "popis": "",
+        "soubor": "NAD1159_1_0793.jpg"
+      }
+    ]
+  },
+  "283_Roman_Mizoč": {
+    "id": 283,
+    "adresar": "Roman/Mizoč",
+    "fotografie": [
+      {
+        "popis": "Pohled na budovu místního cukrovaru",
+        "soubor": "NAD1159_1_0526.jpg"
+      },
+      {
+        "popis": "Školní mládež na výletě v místní pile",
+        "soubor": "NAD1159_1_0527.jpg"
+      }
+    ]
+  },
+  "107_Roman_Novokrajev": {
+    "id": 107,
+    "adresar": "Roman/Novokrajev",
+    "fotografie": [
+      {
+        "popis": "Sbor dobrovolných hasičů před zbrojnicí (20. léta)",
+        "soubor": "NAD1159_1_0588.jpg"
+      },
+      {
+        "popis": "Členky Kroužku vesnických hospodyněk",
+        "soubor": "NAD1159_1_0658.jpg"
+      },
+      {
+        "popis": "Žáci české obecné školy s učitelem, farářem a školním inspektorem (1908)",
+        "soubor": "NAD1159_1_0692.jpg"
+      },
+      {
+        "popis": "Školní žáci s učiteli (1935)",
+        "soubor": "NAD1159_1_0693.jpg"
+      },
+      {
+        "popis": "Členové divadelního ochotnického kroužku Maryša (1919)",
+        "soubor": "NAD1159_1_0752.jpg"
+      },
+      {
+        "popis": "Členové orchestru s hudebními nástroji (1935)",
+        "soubor": "NAD1159_1_0753.jpg"
+      },
+      {
+        "popis": "Uvítání misionáře z Československa místními věřícími (1934)",
+        "soubor": "NAD1159_1_0796.jpg"
+      },
+      {
+        "popis": "Odvedenci z Novokrajeva a Novostavců (1915)",
+        "soubor": "NAD1159_1_0814.jpg"
+      },
+      {
+        "popis": "Vojáci z volyňské obce Novokrajev v březnu 1944",
+        "soubor": "NAD1159_1_0827.jpg"
+      }
+    ]
+  },
+  "310_Roman_Novosilky": {
+    "id": 310,
+    "adresar": "Roman/Novosilky",
+    "fotografie": [
+      {
+        "popis": "Žáci české školy s učitelem Karlem Půlpytlem (1921)",
+        "soubor": "NAD1159_1_0694_1.jpg"
+      },
+      {
+        "popis": "Žáci české školy s učitelem Josefem Bujnovským",
+        "soubor": "NAD1159_1_0694_2.jpg"
+      },
+      {
+        "popis": "Žáci české školy s učitelem Petrem Korňakovem",
+        "soubor": "NAD1159_1_0694_3.jpg"
+      }
+    ]
+  },
+  "108_Roman_Novostavce": {
+    "id": 108,
+    "adresar": "Roman/Novostavce",
+    "fotografie": [
+      {
+        "popis": "Odvedenci z Novokrajeva a Novostavců (1915)",
+        "soubor": "NAD1159_1_0814.jpg"
+      }
+    ]
+  },
+  "390_Roman_Olšanka": {
+    "id": 390,
+    "adresar": "Roman/Olšanka",
+    "fotografie": [
+      {
+        "popis": "Místní kapela v čele s kapelníkem Stejskalem (konec 19. století)",
+        "soubor": "NAD1159_1_0754.jpg"
+      },
+      {
+        "popis": "Dobrovolníci České družiny bratří Klichové s otcem Václavem Klichem, majitelem pivovaru v Olšánkách a spoluzakladatelem České družiny, a s bratranci Václavem Čížkem a Bohuslavem Nejedlým a další starodružiníky (1914)",
+        "soubor": "NAD1159_1_0811_1.jpg"
+      },
+      {
+        "popis": "Polák Jan, zakladatel pivovaru, mlýna a obecní knihovny v Olšance na Volyni, s manželkou Františkou, rozenou Valentovou, Žitomir, portrétní fotografie (1873)",
+        "soubor": "NAD1159_1_0940.jpg"
+      }
+    ]
+  },
+  "109_Roman_Podlisky": {
+    "id": 109,
+    "adresar": "Roman/Podlisky",
+    "fotografie": [
+      {
+        "popis": "Sovětský občanský průkaz Vladimíra Fialy (1941)",
+        "soubor": "NAD_1159_1235-1.jpg"
+      },
+      {
+        "popis": "Sovětský dělnický průkaz Vladimíra Fialy",
+        "soubor": "NAD_1159_1235-2.jpg"
+      },
+      {
+        "popis": "Prozatímní vojenská legitimace příslušníka 1. československé samostatné brigády v SSSR (1944)",
+        "soubor": "NAD_1159_1236.jpg"
+      },
+      {
+        "popis": "Potvrzení o nároku na polní vojenský příjem za dobu léčení v březnu 1945",
+        "soubor": "NAD_1159_1237.jpg"
+      }
+    ]
+  },
+  "152_Roman_Rovno": {
+    "id": 152,
+    "adresar": "Roman/Rovno",
+    "fotografie": [
+      {
+        "popis": "Žena v bílém oblečení při jízdě na kole na silnici Rovno-Dubno protínající obec Chomout.",
+        "soubor": "NAD1159_1_0500_1.jpg"
+      },
+      {
+        "popis": "Žena v černém oblečení při jízdě na kole na silnici Rovno-Dubno protínající obec Chomout.",
+        "soubor": "NAD1159_1_0500_3.jpg"
+      },
+      {
+        "popis": "Václav Maxa, náčelník českého Sokola v Rovně, Dubně a Zdolbunově.",
+        "soubor": "NAD1159_1_0598_1.jpg"
+      },
+      {
+        "popis": "Václav Maxa, náčelník českého Sokola v Rovně, Dubně a Zdolbunově v sokolském kroji na koni.",
+        "soubor": "NAD1159_1_0598_2.jpg"
+      },
+      {
+        "popis": "Skupinová fotografie členů místního Sokola s vedením sokolské jednoty. Skupinová fotografie (1935)",
+        "soubor": "NAD1159_1_0629.jpg"
+      },
+      {
+        "popis": "Tanec skupiny dorostenek s tamburínami 1934-1935",
+        "soubor": "NAD1159_1_0630_1a.jpg"
+      },
+      {
+        "popis": "Dvě dorostenky s tamburínami 1934-1935",
+        "soubor": "NAD1159_1_0630_2a.jpg"
+      }
+    ]
+  },
+  "237_Roman_Semiduby": {
+    "id": 237,
+    "adresar": "Roman/Semiduby",
+    "fotografie": [
+      {
+        "popis": "Ulice obce s řadou obytných domů",
+        "soubor": "NAD1159_1_0541.jpg"
+      },
+      {
+        "popis": "Rodina Glajchova na žebřiňáků (1935)",
+        "soubor": "NAD1159_1_0542_1.jpg"
+      },
+      {
+        "popis": "Rodina Glajchova na žních (1935)",
+        "soubor": "NAD1159_1_0542_2.jpg"
+      },
+      {
+        "popis": "Výrobky Havránkovy cementárny (1943)",
+        "soubor": "NAD1159_1_0543.jpg"
+      },
+      {
+        "popis": "Hasičský sbor s praporem (1912)",
+        "soubor": "NAD1159_1_0589.jpg"
+      },
+      {
+        "popis": "Hasičská hudba (1938)",
+        "soubor": "NAD1159_1_0590.jpg"
+      },
+      {
+        "popis": "Členové Sokolské jednoty ve cvičebních úborech (1932)",
+        "soubor": "NAD1159_1_0631.jpg"
+      },
+      {
+        "popis": "Členové mládežnického orchestru v přátelském posezení (1932)",
+        "soubor": "NAD1159_1_0634.jpg"
+      },
+      {
+        "popis": "Členové místní kapely s hudebními nástroji (1935)",
+        "soubor": "NAD1159_1_0759_1.jpg"
+      },
+      {
+        "popis": "Členové místní kapely s hudebními nástroji",
+        "soubor": "NAD1159_1_0759_2.jpg"
+      },
+      {
+        "popis": "Taneční zábava (1938)",
+        "soubor": "NAD1159_1_0760.jpg"
+      },
+      {
+        "popis": "Vondrák Václav, rodák ze Semidub, redaktor prvního českého časopisu v Rusku",
+        "soubor": "NAD1159_1_0944.jpg"
+      },
+      {
+        "popis": "",
+        "soubor": "NAD1159_1_0540.jpg"
+      }
+    ]
+  },
+  "176_Roman_Senkevičovka": {
+    "id": 176,
+    "adresar": "Roman/Senkevičovka",
+    "fotografie": [
+      {
+        "popis": "Školní mládež před místním nádražím, mezi dospělými v pozadí je učitel Karel Půlpytel (1931)",
+        "soubor": "NAD1159_1_0697_1.jpg"
+      },
+      {
+        "popis": "Účinkující divadelního představení Hoši z první legie (1936)",
+        "soubor": "NAD1159_1_0761.jpg"
+      }
+    ]
+  },
+  "313_Roman_Staromylsk": {
+    "id": 313,
+    "adresar": "Roman/Staromylsk",
+    "fotografie": [
+      {
+        "popis": "Rybník ve Staromylsku u Zdolbunova",
+        "soubor": "NAD1159_1_0544.jpg"
+      }
+    ]
+  },
+  "186_Roman_Sviňuchy": {
+    "id": 186,
+    "adresar": "Roman/Sviňuchy",
+    "fotografie": [
+      {
+        "popis": "Náhradní rodný list Konstantina Závadského, rodáka z obce obci Sviňuchy, vystavený sovětským úřadem v Lucku (nedatováno)",
+        "soubor": "NAD_1159_1522.jpg"
+      },
+      {
+        "popis": "Potvrzení o službě v československé vojenské jednotce v SSSR pro Konstantina Závadského, rodáka z obce obci Sviňuchy (1944)",
+        "soubor": "NAD_1159_1523.jpg"
+      },
+      {
+        "popis": "Prozatímní vojenská legitimace Konstantina Závadského, příslušníka 1. československé samostatné brigády v SSSR, rodáka z obce obci Sviňuchy (1944)",
+        "soubor": "NAD_1159_1524.jpg"
+      }
+    ]
+  },
+  "269_Roman_Volkov": {
+    "id": 269,
+    "adresar": "Roman/Volkov",
+    "fotografie": [
+      {
+        "popis": "Cvičení sokolek s tamburínami (1932)",
+        "soubor": "NAD1159_1_0634.jpg"
+      }
+    ]
+  },
+  "120_Roman_Zborov": {
+    "id": 120,
+    "adresar": "Roman/Zborov",
+    "fotografie": [
+      {
+        "popis": "Členové místní správy v obci Zborov u Lucku (1947)",
+        "soubor": "NAD1159_1_0529.jpg"
+      }
+    ]
+  },
+  "318_Roman_Zdolbice": {
+    "id": 318,
+    "adresar": "Roman/Zdolbice",
+    "fotografie": [
+      {
+        "popis": "Dospělí a děti před kostelem",
+        "soubor": "NAD1159_1_0799.jpg"
+      }
+    ]
+  },
+  "319_Roman_Zdolbunov": {
+    "id": 319,
+    "adresar": "Roman/Zdolbunov",
+    "fotografie": [
+      {
+        "popis": "Celkový pohled na město, v pozadí budova české školy (30. léta)",
+        "soubor": "NAD1159_1_0550.jpg"
+      },
+      {
+        "popis": "Okolí Zdolbunova – Křídová hora",
+        "soubor": "NAD1159_1_0551.jpg"
+      },
+      {
+        "popis": "Jízda v povoze místní ulicí",
+        "soubor": "NAD1159_1_0552.jpg"
+      },
+      {
+        "popis": "Příručí obchodu pana Alexandra Khola (1922)",
+        "soubor": "NAD1159_1_0556.jpg"
+      },
+      {
+        "popis": "Výbor České besedy v Zdolbunově",
+        "soubor": "NAD1159_1_0557.jpg"
+      },
+      {
+        "popis": "Členové České besedy s předsedou Národní rady československé A. Prokůpkem za jeho návštěvy v Zdolbunově (1928)",
+        "soubor": "NAD1159_1_0558_1.jpg"
+      },
+      {
+        "popis": "Členové tělocvičného odboru České besedy v Zdolbunově",
+        "soubor": "NAD1159_1_0559.jpg"
+      },
+      {
+        "popis": "Členové České besedy v Zdolbunově se školními žáky [1928]",
+        "soubor": "NAD1159_1_0560.jpg"
+      },
+      {
+        "popis": "Alexandr Khol, starosta Sokola Zdolbunov v letech 1927-1938",
+        "soubor": "NAD1159_1_0635.jpg"
+      },
+      {
+        "popis": "Členové výboru sokolské jednoty v Zdolbunově",
+        "soubor": "NAD1159_1_0636.jpg"
+      },
+      {
+        "popis": "Členstvo Sokola Zdolbunov se starostou Alexandrem Kholem a náčelníkem Václavem Maxou",
+        "soubor": "NAD1159_1_0637.jpg"
+      },
+      {
+        "popis": "Muži, členové Sokola Zdolbunov",
+        "soubor": "NAD1159_1_0638.jpg"
+      },
+      {
+        "popis": "Ženy, členky Sokola Zdolbunov s náčelníkem Václavem Maxou",
+        "soubor": "NAD1159_1_0639.jpg"
+      },
+      {
+        "popis": "Dorostenky Sokola Zdolbunov",
+        "soubor": "NAD1159_1_0640.jpg"
+      },
+      {
+        "popis": "Mladší žákyně Sokola Zdolbunov",
+        "soubor": "NAD1159_1_0641.jpg"
+      },
+      {
+        "popis": "Z veřejného cvičení mužů na bradlech konaného v Zdolbunově v srpnu 1930",
+        "soubor": "NAD1159_1_0644.jpg"
+      },
+      {
+        "popis": "Účastníci konference učitelů českých škol na Volyni, konané v Zdolbunově (1934)",
+        "soubor": "NAD1159_1_0662.jpg"
+      },
+      {
+        "popis": "Čtyřtřídní obecná škola, skupinová fotografie žáků s učiteli",
+        "soubor": "NAD1159_1_0708.jpg"
+      },
+      {
+        "popis": "Stavba sedmitřídní obecné školy Komenského, průčelí novostavby (30. léta)",
+        "soubor": "NAD1159_1_0709.jpg"
+      },
+      {
+        "popis": "Školní oslavy vzniku Československé republiky a narozenin československého prezidenta T.G. Masaryka",
+        "soubor": "NAD1159_1_0710.jpg"
+      },
+      {
+        "popis": "Děti školního tanečního kroužku v lidových krojích 1927",
+        "soubor": "NAD1159_1_0711.jpg"
+      },
+      {
+        "popis": "Žák Zdolbunovské školy s basou",
+        "soubor": "NAD1159_1_0712-1.jpg"
+      },
+      {
+        "popis": "Záběr ze školního divadelního představení",
+        "soubor": "NAD1159_1_0712_10.jpg"
+      },
+      {
+        "popis": "Ředitel školy Josef Kosek a učitelský sbor (1936-1937)",
+        "soubor": "NAD1159_1_0713.jpg"
+      },
+      {
+        "popis": "Žáci, učitelé a občané Zdolbunova před školní budovou.",
+        "soubor": "NAD1159_1_0716_3.jpg"
+      },
+      {
+        "popis": "Zakladatelé divadelního kroužku. Skupinová fotografie",
+        "soubor": "NAD1159_1_0764.jpg"
+      },
+      {
+        "popis": "Baptisté před modlitebním domem ve Zdolbunově",
+        "soubor": "NAD1159_1_0800_1.jpg"
+      },
+      {
+        "popis": "Modlitební dům baptistů",
+        "soubor": "NAD1159_1_0800_2.jpg"
+      },
+      {
+        "popis": "Pěvecký sbor baptistů. Skupinová fotografie (1927)",
+        "soubor": "NAD1159_1_0801.jpg"
+      },
+      {
+        "popis": "Pohlednice pravoslavného chrámu při železniční stanici Zdolbunov",
+        "soubor": "NAD1159_1_0957.jpg"
+      },
+      {
+        "popis": "",
+        "soubor": "NAD1159_1_0643.jpg"
+      }
+    ]
+  },
+  "317_Roman_Zálesí": {
+    "id": 317,
+    "adresar": "Roman/Zálesí",
+    "fotografie": [
+      {
+        "popis": "Školní divadelní soubor",
+        "soubor": "NAD1159_1_0707.jpg"
+      }
+    ]
+  },
+  "329_Roman_Závidov": {
+    "id": 329,
+    "adresar": "Roman/Závidov",
+    "fotografie": [
+      {
+        "popis": "Sbor dobrovolných hasičů před zbrojnicí (1929)",
+        "soubor": "NAD1159_1_0597.jpg"
+      }
+    ]
+  },
+  "129_Roman_Újezdce": {
+    "id": 129,
+    "adresar": "Roman/Újezdce",
+    "fotografie": [
+      {
+        "popis": "Usedlosti Vladimíra Lochmana (1947)",
+        "soubor": "NAD1159_1_0546_1.jpg"
+      },
+      {
+        "popis": "Usedlosti Mikuláše Lochmana (1947)",
+        "soubor": "NAD1159_1_0546_2.jpg"
+      },
+      {
+        "popis": "Devadesátiletý pan Ledvina z Újezdců při práci",
+        "soubor": "NAD1159_1_0547.jpg"
+      },
+      {
+        "popis": "Průvod hasičů s praporem",
+        "soubor": "NAD1159_1_0593.jpg"
+      },
+      {
+        "popis": "Hasiči před hasičskými povozy (1938)",
+        "soubor": "NAD1159_1_0594.jpg"
+      },
+      {
+        "popis": "Členové Sdružení české mládeže v Újezdcích (1935)",
+        "soubor": "NAD1159_1_0656.jpg"
+      },
+      {
+        "popis": "Členové školního divadelního kroužku s učitelkou (1932)",
+        "soubor": "NAD1159_1_0704.jpg"
+      },
+      {
+        "popis": "Návštěvníci dětské nedělní školy baptistického sboru",
+        "soubor": "NAD1159_1_0798_1.jpg"
+      },
+      {
+        "popis": "Návštěvníci dětské nedělní školy baptistického sboru (1937)",
+        "soubor": "NAD1159_1_0798_2.jpg"
+      }
+    ]
+  },
+  "332_Roman_Žitomír": {
+    "id": 332,
+    "adresar": "Roman/Žitomír",
+    "fotografie": [
+      {
+        "popis": "Skupina českých volitelů z Žitomirského újezdu ve volbách do Státní dumy v Rusku v roce 1906 (kopie)",
+        "soubor": "NAD1159_1_0927.jpg"
+      },
+      {
+        "popis": "",
+        "soubor": "NAD1159_1_0928_1.jpg"
+      }
+    ]
+  },
+  "15_Straklov": {
+    "id": 15,
+    "adresar": "Straklov",
+    "fotografie": [
+      {
+        "popis": "Účasníci veřejného sokolského cvičení ve Straklově, 1932",
+        "soubor": "NAD1159_1_0632.jpg"
+      },
+      {
+        "popis": "Nástup a cvičení starších žáků, 1937",
+        "soubor": "NAD1159_1_0633_1.jpg"
+      }
+    ]
+  },
+  "16_Ulbárov": {
+    "id": 16,
+    "adresar": "Ulbárov",
+    "fotografie": [
+      {
+        "popis": "Prapor  hasičského sboru obce Český Ulbárov z roku 1925",
+        "soubor": "H8-16690.jpg"
+      },
+      {
+        "popis": "Pohřeb z nadhledu na skupinu smutečních hostí u Ulbárově při pohřbu Josefa Šimona, v roce 1934",
+        "soubor": "H8_18428.jpg"
+      },
+      {
+        "popis": "Uniformovaná kapela v Ulbárově pod vedením Najmona, pravděpodobně repro z původního originálu, asi v roce 1916",
+        "soubor": "H8_18429.jpg"
+      }
+    ]
+  }
+}

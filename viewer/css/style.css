@@ -291,9 +291,15 @@ body {
     border-radius: 50%;
 }
 
+.leaflet-points-pane path,
+.leaflet-marker-icon.pie-marker {
+    filter: drop-shadow(0 1px 1.5px rgb(35 35 35 / 40%));
+}
+
 .leaflet-marker-icon.pie-marker {
     background: none;
     border: 0;
+    overflow: visible;
     pointer-events: auto;
 }
 
@@ -321,6 +327,33 @@ body {
     padding: 0 0 2px;
     max-width: 280px;
     word-break: break-word;
+}
+
+.foto-block {
+    margin-top: 8px;
+    max-height: 320px;
+    overflow: auto;
+}
+
+.foto-heading {
+    margin: 6px 0 4px;
+    font-weight: 600;
+}
+
+.foto-item {
+    margin: 0 0 10px;
+}
+
+.foto-item img {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    background: #eee;
+}
+
+.foto-item figcaption {
+    margin-top: 3px;
 }
 
 .map-legend {
